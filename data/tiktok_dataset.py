@@ -13,7 +13,6 @@ class TikTokDataset(Dataset):
         self.masks = []
         self.transform = transform
         self.train = train
-        TRAIN_TEST_SPLIT = int(0.8 * len(self.images))
         appended_path = root_dir + "/TikTok_dataset"
 
         # This should be ok because Image.open lazy loads, keeping memory clear
@@ -22,6 +21,7 @@ class TikTokDataset(Dataset):
             self.masks += glob.glob(f"{appended_path}/{folder}/masks/*.png")
 
         assert len(self.images) == len(self.masks), "Images Length != Masks Length"
+        TRAIN_TEST_SPLIT = int(0.8 * len(self.images))
 
         self.train_images = self.images[:TRAIN_TEST_SPLIT]
         self.train_masks = self.masks[:TRAIN_TEST_SPLIT]
