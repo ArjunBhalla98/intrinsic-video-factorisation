@@ -31,7 +31,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "-batch", metavar="batch", help="Batch Size", type=int, default=32, required=False,
+    "--batch", metavar="batch", help="Batch Size", type=int, default=32, required=False,
 )
 
 parser.add_argument(
@@ -76,10 +76,14 @@ if __name__ == "__main__":
 
     # Handle all data loading and related stuff
     transform = transforms.Compose([transforms.ToTensor()])
-    dataset_train = TikTokDataset(ROOT_DIR, device, transform=transform)
-    dataset_test = TikTokDataset(ROOT_DIR, device, train=False, transform=transform)
-    train_loader = DataLoader(dataset_train, batch_size=BATCH_SIZE, shuffle=False)
-    test_loader = DataLoader(dataset_test, batch_size=BATCH_SIZE, shuffle=False)
+    dataset_train = TikTokDataset(
+        ROOT_DIR, device, transform=transform, sample_size=BATCH_SIZE
+    )
+    dataset_test = TikTokDataset(
+        ROOT_DIR, device, train=False, transform=transform, sample_size=BATCH_SIZE
+    )
+    train_loader = DataLoader(dataset_train, shuffle=True)
+    test_loader = DataLoader(dataset_test, shuffle=True)
     print("Data Loaded")
 
     # Handle all model related stuff
@@ -103,13 +107,13 @@ if __name__ == "__main__":
         running_loss = 0
 
         for i, data in tqdm(enumerate(train_loader), total=len(train_loader)):
-            mask = data["mask"]
-            image = data["image"]
+            masks = data["masks"].squeeze(0)
+            images = data["images"].squeeze(0)
 
             optimizer.zero_grad()
 
-            out = model(image)
-            loss = criterion(out, mask.expand_as(out))
+            out = model(images)
+            loss = criterion(out, masks.expand_as(out))
             running_loss += loss.item()
             loss.backward()
             optimizer.step()
