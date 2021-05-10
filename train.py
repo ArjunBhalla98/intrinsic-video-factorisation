@@ -4,14 +4,15 @@ from tqdm import tqdm
 import torch.nn as nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
-from dummy_model import DummyCNN
 from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 from data.tiktok_dataset import TikTokDataset
 
+# To change loss or model, adjust these:
+from loss.unsupervised_loss import l1_loss as criterion
+from models.dummy_model import DummyCNN as training_model
+
 parser = argparse.ArgumentParser(description="Train a model on the TikTok Dataset.")
-optimizers = ["adam", "sgd"]
-loss_fns = ["mse", "crossentropy"]
 
 parser.add_argument(
     "--root_dir",
@@ -38,33 +39,11 @@ parser.add_argument(
     "-lr", metavar="lr", help="Learning Rate", type=float, default=1e-3, required=False,
 )
 
-parser.add_argument(
-    "-optim",
-    metavar="optimizer",
-    choices=optimizers,
-    help="Choose an optimizer",
-    type=str,
-    default="sgd",
-    required=False,
-)
-
-parser.add_argument(
-    "-loss",
-    metavar="loss",
-    choices=loss_fns,
-    help="Choose a loss function",
-    type=str,
-    default="mse",
-    required=False,
-)
-
 args = parser.parse_args()
 ROOT_DIR = args.root_dir
 N_EPOCHS = args.epochs
 BATCH_SIZE = args.batch
 LR = args.lr
-OPTIM = args.optim
-LOSS_FN = args.loss
 
 if __name__ == "__main__":
     if torch.cuda.is_available():
@@ -87,17 +66,11 @@ if __name__ == "__main__":
     print("Data Loaded")
 
     # Handle all model related stuff
-    model = DummyCNN()
+    model = training_model()
 
-    if OPTIM == optimizers[0]:
-        optimizer = optim.Adam(model.parameters(), lr=LR, betas=(0.9, 0.999))
-    else:
-        optimizer = optim.SGD(model.parameters(), lr=LR, momentum=0.9)
+    # Do the loss function / model thing for this too if needed
+    optimizer = optim.Adam(model.parameters(), lr=LR, betas=(0.9, 0.999))
 
-    if LOSS_FN == loss_fns[0]:
-        criterion = nn.MSELoss()
-    else:
-        criterion = nn.CrossEntropyLoss()
     print("Model and auxillary components initialized")
 
     # Train loop
@@ -113,7 +86,7 @@ if __name__ == "__main__":
             optimizer.zero_grad()
 
             out = model(images)
-            loss = criterion(out, masks.expand_as(out))
+            loss = criterion(out)
             running_loss += loss.item()
             loss.backward()
             optimizer.step()
