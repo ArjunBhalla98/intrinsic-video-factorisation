@@ -53,9 +53,14 @@ parser.add_argument(
     "-lr", metavar="lr", help="Learning Rate", type=float, default=1e-3, required=False,
 )
 
+parser.add_argument(
+    "--dev", help="Cuda device if using GPU", type=str, default="0", required=False
+)
+
 args = parser.parse_args()
 ROOT_DIR = args.root_dir
 N_EPOCHS = args.epochs
+CUDA_DEV = args.dev
 BATCH_SIZE = args.batch
 LR = args.lr
 LOAD_PATH = args.load_state
@@ -63,7 +68,7 @@ SAVE_PATH = args.save_state
 
 if __name__ == "__main__":
     if torch.cuda.is_available():
-        dev = "cuda:0"
+        dev = f"cuda:{CUDA_DEV}"
     else:
         dev = "cpu"
 
