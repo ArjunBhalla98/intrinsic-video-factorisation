@@ -128,7 +128,7 @@ if __name__ == "__main__":
 
             transport, albedo, light = model(gt)
             transport = transport.reshape(BATCH_SIZE, 1024 * 1024, 9).to(device)
-            albedo = albedo.squeeze(0).permute(0, 2, 3, 1).to(device)
+            albedo = albedo.permute(0, 2, 3, 1).to(device)
             shading = (
                 (transport @ light).reshape(BATCH_SIZE, 1024, 1024, 3).to(device)
             )  # get rid of the magic numbers at some point if we use this properly
