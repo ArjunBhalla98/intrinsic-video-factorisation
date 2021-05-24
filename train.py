@@ -127,10 +127,10 @@ if __name__ == "__main__":
             gt = (images * masks).to(device)
 
             transport, albedo, light = model(gt)
-            transport = transport.reshape(BATCH_SIZE, 1024 * 1024, 9).to(device)
+            transport = transport.view(BATCH_SIZE, 1024 * 1024, 9).to(device)
             albedo = albedo.permute(0, 2, 3, 1).to(device)
             shading = (
-                (transport @ light).reshape(BATCH_SIZE, 1024, 1024, 3).to(device)
+                (transport @ light).view(BATCH_SIZE, 1024, 1024, 3).to(device)
             )  # get rid of the magic numbers at some point if we use this properly
             rendering = (albedo * shading).permute(0, 3, 1, 2).to(device)
 
