@@ -14,3 +14,7 @@ def l1_loss(results):
 
     return losses.sum()
 
+
+def l1_reconstruction_loss(predicted, gt):
+    return torch.abs(predicted - gt).sum()
+

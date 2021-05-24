@@ -4,12 +4,21 @@ import torch
 import random
 import numpy as np
 from PIL import Image
+from utils import squarize_image
 from collections import defaultdict
 from torch.utils.data.dataset import Dataset
 
 
 class TikTokDataset(Dataset):
-    def __init__(self, root_dir, device, train=True, transform=None, sample_size=4):
+    def __init__(
+        self,
+        root_dir,
+        device,
+        train=True,
+        transform=None,
+        sample_size=4,
+        squarize_size=None,
+    ):
         """
         Initialises the TikTok Dataset. This will return, upon "getitem", a sample that is 
         temporally contiguous from a random video, of length sample_size. This function is built to
@@ -26,7 +35,8 @@ class TikTokDataset(Dataset):
         self.transform = transform
         self.train = train
         self.sample_size = sample_size
-        appended_path = root_dir + "/TikTok_dataset"
+        self.squarize_size = squarize_size
+        appended_path = root_dir
 
         for folder in os.listdir(appended_path):
             video_imgs = glob.glob(f"{appended_path}/{folder}/images/*.png")
@@ -68,10 +78,28 @@ class TikTokDataset(Dataset):
             video_masks = self.test_masks
 
         images = np.array(
-            list(map(lambda im: np.array(Image.open(im)), video_imgs[idx],))
+            list(
+                map(
+                    lambda im: squarize_image(
+                        Image.open(im), self.squarize_size
+                    ).numpy()
+                    if self.squarize_size
+                    else np.array(Image.open(im)),
+                    video_imgs[idx],
+                )
+            )
         )
         masks = np.asarray(
-            list(map(lambda im: np.array(Image.open(im)), video_masks[idx],))
+            list(
+                map(
+                    lambda im: squarize_image(
+                        Image.open(im), self.squarize_size
+                    ).numpy()
+                    if self.squarize_size
+                    else np.array(Image.open(im)),
+                    video_masks[idx],
+                )
+            )
         )
 
         if self.transform:

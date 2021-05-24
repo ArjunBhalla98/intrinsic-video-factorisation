@@ -1,23 +1,21 @@
 import torch
 import argparse
 from tqdm import tqdm
-import torch.nn as nn
 import torch.optim as optim
-import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 from data.tiktok_dataset import TikTokDataset
 
 # To change loss or model, adjust these:
-from loss.unsupervised_loss import l1_loss as criterion
-from models.dummy_model import DummyCNN as training_model
+from loss.unsupervised_loss import l1_reconstruction_loss as criterion
+from models.relighting_model import CNNAE2ResNet as training_model
 
 parser = argparse.ArgumentParser(description="Train a model on the TikTok Dataset.")
 
 parser.add_argument(
     "--root_dir",
     metavar="root",
-    help="The root directory of your TikTok_dataset. Do not include the dataset path, just the folder containing it.",
+    help="The root directory of your TikTok_dataset.",
     type=str,
     required=True,
 )
@@ -28,6 +26,22 @@ parser.add_argument(
     help="Number of epochs to train for",
     type=int,
     default=25,
+    required=False,
+)
+
+parser.add_argument(
+    "--load_state",
+    metavar="load",
+    help="Path to pretrained model weights, if req'd",
+    type=str,
+    required=False,
+)
+
+parser.add_argument(
+    "--save_state",
+    metavar="save",
+    help="Path to save trained model weights, if req'd",
+    type=str,
     required=False,
 )
 
@@ -44,6 +58,8 @@ ROOT_DIR = args.root_dir
 N_EPOCHS = args.epochs
 BATCH_SIZE = args.batch
 LR = args.lr
+LOAD_PATH = args.load_state
+SAVE_PATH = args.save_state
 
 if __name__ == "__main__":
     if torch.cuda.is_available():
@@ -56,10 +72,19 @@ if __name__ == "__main__":
     # Handle all data loading and related stuff
     transform = transforms.Compose([transforms.ToTensor()])
     dataset_train = TikTokDataset(
-        ROOT_DIR, device, transform=transform, sample_size=BATCH_SIZE
+        ROOT_DIR,
+        device,
+        transform=transform,
+        sample_size=BATCH_SIZE,
+        squarize_size=1024,
     )
     dataset_test = TikTokDataset(
-        ROOT_DIR, device, train=False, transform=transform, sample_size=BATCH_SIZE
+        ROOT_DIR,
+        device,
+        train=False,
+        transform=transform,
+        sample_size=BATCH_SIZE,
+        squarize_size=1024,
     )
     train_loader = DataLoader(dataset_train, shuffle=True)
     test_loader = DataLoader(dataset_test, shuffle=True)
@@ -67,6 +92,9 @@ if __name__ == "__main__":
 
     # Handle all model related stuff
     model = training_model()
+
+    if LOAD_PATH:
+        model.load_state_dict(torch.load(LOAD_PATH))
 
     # Do the loss function / model thing for this too if needed
     optimizer = optim.Adam(model.parameters(), lr=LR, betas=(0.9, 0.999))
@@ -83,10 +111,22 @@ if __name__ == "__main__":
             masks = data["masks"].squeeze(0)
             images = data["images"].squeeze(0)
 
+            images = images.to(device)
+            masks = masks.to(device)
+
             optimizer.zero_grad()
 
-            out = model(images)
-            loss = criterion(out)
+            # for running relighting humans
+            images = 2.0 * images - 1
+            gt = (images * masks).to(device)
+
+            transport, albedo, light = model(gt)
+            transport = transport.reshape(1024, 1024, 9)
+            albedo = albedo.squeeze().permute(1, 2, 0)
+            shading = transport @ light
+            rendering = (albedo * shading).permute(2, 0, 1)
+
+            loss = criterion(rendering, gt)
             running_loss += loss.item()
             loss.backward()
             optimizer.step()
@@ -94,3 +134,6 @@ if __name__ == "__main__":
         print(f"Loss: {running_loss / len(train_loader)}")
 
     print("Training Finished")
+
+    if SAVE_PATH:
+        torch.save(training_model.state_dict(), SAVE_PATH)
