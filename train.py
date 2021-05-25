@@ -125,6 +125,10 @@ if __name__ == "__main__":
             # for running relighting humans
             images = 2.0 * images - 1
             gt = (images * masks).to(device)
+            if torch.cuda.is_available():
+                del images
+                del masks
+                torch.cuda.empty_cache()
 
             transport, albedo, light = model(gt)
             transport = transport.view(BATCH_SIZE, 1024 * 1024, 9).to(device)
@@ -138,6 +142,13 @@ if __name__ == "__main__":
             running_loss += loss.item()
             loss.backward()
             optimizer.step()
+            if torch.cuda.is_available():
+                del transport
+                del albedo
+                del light
+                del shading
+                del rendering
+                torch.cuda.empty_cache()
 
         print(f"Loss: {running_loss / len(train_loader)}")
 

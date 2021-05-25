@@ -1,4 +1,5 @@
 import torch
+import sys
 from PIL import ImageOps, Image
 import torchvision.transforms as transforms
 
@@ -18,7 +19,7 @@ def squarize_image(image: Image.Image, new_size: int = 1024) -> torch.Tensor:
         img = ImageOps.expand(image, padding)
 
         transform = transforms.Compose(
-            [transforms.Resize([new_size, new_size]), transforms.ToTensor()]
+            [transforms.CenterCrop([new_size, new_size]), transforms.ToTensor()]
         )
         img = transform(img)
 
