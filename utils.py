@@ -12,8 +12,6 @@ def squarize_image(image: Image.Image, new_size: int = 1024) -> torch.Tensor:
     """
 
     w, h = image.size
-    if w >= new_size or h >= new_size:
-        print("IMAGE TOO BIG: CAUSING CRASH?")
     if w != h:
         side_padding = (new_size - w) // 2
         tops_padding = (new_size - h) // 2
