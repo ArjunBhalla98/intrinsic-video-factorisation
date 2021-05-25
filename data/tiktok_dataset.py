@@ -38,7 +38,7 @@ class TikTokDataset(Dataset):
         self.squarize_size = squarize_size
         appended_path = root_dir
 
-        for folder in os.listdir(appended_path):
+        for folder in os.listdir(appended_path)[:40]:
             video_imgs = glob.glob(f"{appended_path}/{folder}/images/*.png")
             video_masks = glob.glob(f"{appended_path}/{folder}/masks/*.png")
 
