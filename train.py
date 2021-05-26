@@ -155,4 +155,4 @@ if __name__ == "__main__":
     print("Training Finished")
 
     if SAVE_PATH:
-        torch.save(training_model.state_dict(), SAVE_PATH)
+        torch.save(model.state_dict(), SAVE_PATH)
