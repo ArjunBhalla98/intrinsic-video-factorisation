@@ -69,7 +69,6 @@ class TikTokDataset(Dataset):
 
             assert len(self.images) == len(self.masks), "Images Length != Masks Length"
 
-        print(self.names)
         TRAIN_TEST_SPLIT = round(0.8 * len(self.images))
         self.train_images = self.images[:TRAIN_TEST_SPLIT]
         self.train_masks = self.masks[:TRAIN_TEST_SPLIT]
@@ -133,5 +132,5 @@ class TikTokDataset(Dataset):
                 list(map(lambda im: torch.unsqueeze(self.transform(im), 0), masks)),
                 dim=0,
             )
-        print(len(video_names))
+
         return {"images": images, "masks": masks, "names": video_names[idx]}
