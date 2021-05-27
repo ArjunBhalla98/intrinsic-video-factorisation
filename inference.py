@@ -90,7 +90,7 @@ if __name__ == "__main__":
         albedo = albedo.permute(0, 2, 3, 1).to(device)
         shading = (transport @ light.squeeze()).view(1024, 1024, 3).to(device)
         rendering = (albedo.squeeze() * shading).to(device)
-        imsave(name, rendering.detach().numpy())
+        imsave(name, rendering.detach().cpu().numpy())
 
     print(f"Eval Finished - images are in {SAVE_DIR}")
 
