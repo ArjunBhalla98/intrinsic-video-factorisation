@@ -32,6 +32,7 @@ class TikTokDataset(Dataset):
         """
         self.images = []
         self.masks = []
+        self.names = []
         self.transform = transform
         self.train = train
         self.sample_size = sample_size
@@ -39,6 +40,9 @@ class TikTokDataset(Dataset):
         appended_path = root_dir
 
         for folder in os.listdir(appended_path)[:40]:
+            if not os.path.isdir(appended_path + folder):
+                continue
+
             video_imgs = glob.glob(f"{appended_path}/{folder}/images/*.png")
             video_masks = glob.glob(f"{appended_path}/{folder}/masks/*.png")
 
@@ -51,14 +55,29 @@ class TikTokDataset(Dataset):
                 for i in range(0, len(video_masks), sample_size)
             ]
 
+            self.names += list(
+                map(
+                    lambda nested_paths: list(
+                        map(lambda x: f"{folder}_{x[x.rfind('/')+1:]}", nested_paths)
+                    ),
+                    (
+                        video_imgs[i : i + sample_size]
+                        for i in range(0, len(video_imgs), sample_size)
+                    ),
+                )
+            )
+
             assert len(self.images) == len(self.masks), "Images Length != Masks Length"
 
+        print(self.names)
         TRAIN_TEST_SPLIT = round(0.8 * len(self.images))
         self.train_images = self.images[:TRAIN_TEST_SPLIT]
         self.train_masks = self.masks[:TRAIN_TEST_SPLIT]
+        self.train_names = self.names[:TRAIN_TEST_SPLIT]
 
         self.test_images = self.images[TRAIN_TEST_SPLIT:]
         self.test_masks = self.masks[TRAIN_TEST_SPLIT:]
+        self.test_names = self.names[TRAIN_TEST_SPLIT:]
 
     def __len__(self):
         if self.train:
@@ -73,9 +92,11 @@ class TikTokDataset(Dataset):
         if self.train:
             video_imgs = self.train_images
             video_masks = self.train_masks
+            video_names = self.train_names
         else:
             video_imgs = self.test_images
             video_masks = self.test_masks
+            video_names = self.test_names
 
         images = np.array(
             list(
@@ -89,7 +110,7 @@ class TikTokDataset(Dataset):
                 )
             )
         )
-        masks = np.asarray(
+        masks = np.array(
             list(
                 map(
                     lambda im: squarize_image(
@@ -112,5 +133,5 @@ class TikTokDataset(Dataset):
                 list(map(lambda im: torch.unsqueeze(self.transform(im), 0), masks)),
                 dim=0,
             )
-
-        return {"images": images, "masks": masks}
+        print(len(video_names))
+        return {"images": images, "masks": masks, "names": video_names[idx]}
