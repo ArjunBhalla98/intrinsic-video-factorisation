@@ -1,10 +1,13 @@
+from PIL import Image
 import torch
 import argparse
+import numpy as np
 from tqdm import tqdm
 import torch.optim as optim
 from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 from data.tiktok_dataset import TikTokDataset
+import imageio
 
 # To change loss or model, adjust these:
 from loss.unsupervised_loss import l1_reconstruction_loss as criterion
@@ -123,7 +126,6 @@ if __name__ == "__main__":
             optimizer.zero_grad()
 
             # for running relighting humans
-            images = 2.0 * images - 1
             gt = (images * masks).to(device)
             if torch.cuda.is_available():
                 del images
@@ -131,14 +133,19 @@ if __name__ == "__main__":
                 torch.cuda.empty_cache()
 
             transport, albedo, light = model(gt)
-            transport = transport.view(gt.size(0), 1024 * 1024, 9).to(device)
-            albedo = albedo.permute(0, 2, 3, 1).to(device)
-            shading = (
-                (transport @ light).view(gt.size(0), 1024, 1024, 3).to(device)
-            )  # get rid of the magic numbers at some point if we use this properly
-            rendering = (albedo * shading).permute(0, 3, 1, 2).to(device)
+            transport = transport.squeeze(0)
+            albedo = albedo.squeeze(0)
+            light = light.squeeze(0)
+            transport = transport.permute(1, 2, 0).to(device)
+            albedo = albedo.permute(1, 2, 0).to(device)
+            shading = (transport @ light).to(device)
+            rendering = (albedo * shading * 255.0).to(device)
 
-            loss = criterion(rendering, gt)
+            im = imageio.imsave(
+                "rendering.png", (rendering.detach().numpy()).astype(np.uint8),
+            )
+
+            loss = criterion(rendering.permute(2, 0, 1), gt)
             running_loss += loss.item()
             loss.backward()
             optimizer.step()
