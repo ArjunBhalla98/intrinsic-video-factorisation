@@ -1,5 +1,6 @@
 from PIL import Image
 import torch
+from torch.autograd import Variable
 import argparse
 import numpy as np
 from tqdm import tqdm
@@ -124,21 +125,25 @@ if __name__ == "__main__":
             masks = masks.to(device)
 
             optimizer.zero_grad()
-
+            mask3 = torch.repeat_interleave(masks, 3, dim=0).squeeze(1)
+            mask9 = torch.repeat_interleave(masks, 9, dim=0).squeeze(1)
+            print(mask3.size(), mask9.size(), images.size())
             # for running relighting humans
-            gt = (images * masks).to(device)
+            images = 2.0 * images - 1
+            gt = (images * mask3).to(device)
 
             transport, albedo, light = model(gt)
-            transport = transport.squeeze(0)
-            albedo = albedo.squeeze(0)
-            light = light.squeeze(0)
+            transport = Variable((mask9 * transport).data[0], requires_grad=True)
+            albedo = Variable((albedo * mask3).data[0], requires_grad=True)
+            light = Variable(light.data, requires_grad=True)
             transport = transport.permute(1, 2, 0).to(device)
             albedo = albedo.permute(1, 2, 0).to(device)
             imageio.imsave("albedo_test.png", albedo.detach().cpu().numpy())
             shading = torch.matmul(transport, light).to(device)
             rendering = (albedo * shading * 255.0).to(device)
 
-            loss = criterion(rendering.permute(2, 0, 1), gt)
+            loss = criterion(rendering.permute(2, 0, 1), gt.squeeze(0))
+            print(loss)
             running_loss += loss.item()
             loss.backward()
             optimizer.step()
