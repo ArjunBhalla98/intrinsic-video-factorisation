@@ -125,8 +125,14 @@ if __name__ == "__main__":
             masks = masks.to(device)
 
             optimizer.zero_grad()
-            mask3 = torch.repeat_interleave(masks, 3, dim=0).squeeze(1)
-            mask9 = torch.repeat_interleave(masks, 9, dim=0).squeeze(1)
+            mask3 = Variable(
+                torch.from_numpy(np.repeat(masks.detach().cpu().numpy(), 3, axis=0)),
+                requires_grad=True,
+            ).squeeze(1)
+            mask9 = Variable(
+                torch.from_numpy(np.repeat(masks.detach().cpu().numpy(), 9, axis=0)),
+                requires_grad=True,
+            ).squeeze(1)
             print(mask3.size(), mask9.size(), images.size())
             # for running relighting humans
             images = 2.0 * images - 1
