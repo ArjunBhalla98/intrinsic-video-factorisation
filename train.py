@@ -134,9 +134,9 @@ if __name__ == "__main__":
             light = light.squeeze(0)
             transport = transport.permute(1, 2, 0).to(device)
             albedo = albedo.permute(1, 2, 0).to(device)
+            imageio.imsave("albedo_test.png", albedo.detach().cpu().numpy())
             shading = torch.matmul(transport, light).to(device)
             rendering = (albedo * shading * 255.0).to(device)
-            imageio.imsave("render_test.png", rendering.detach().cpu().numpy())
 
             loss = criterion(rendering.permute(2, 0, 1), gt)
             running_loss += loss.item()
