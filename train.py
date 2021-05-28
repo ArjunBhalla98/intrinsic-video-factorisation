@@ -127,10 +127,6 @@ if __name__ == "__main__":
 
             # for running relighting humans
             gt = (images * masks).to(device)
-            if torch.cuda.is_available():
-                del images
-                del masks
-                torch.cuda.empty_cache()
 
             transport, albedo, light = model(gt)
             transport = transport.squeeze(0)
@@ -140,18 +136,12 @@ if __name__ == "__main__":
             albedo = albedo.permute(1, 2, 0).to(device)
             shading = (transport @ light).to(device)
             rendering = (albedo * shading * 255.0).to(device)
+            imageio.imsave("render_test.png", rendering.detach().cpu().numpy())
 
             loss = criterion(rendering.permute(2, 0, 1), gt)
             running_loss += loss.item()
             loss.backward()
             optimizer.step()
-            if torch.cuda.is_available():
-                del transport
-                del albedo
-                del light
-                del shading
-                del rendering
-                torch.cuda.empty_cache()
 
         print(f"Loss: {running_loss / len(train_loader)}")
 
