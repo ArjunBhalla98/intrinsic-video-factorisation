@@ -159,9 +159,7 @@ if __name__ == "__main__":
             shading = torch.matmul(transport, light).to(device)
             rendering = (albedo * shading * 255.0).to(device)
 
-            imageio.imsave("render_test.png", rendering.detach().cpu().numpy())
             loss = criterion(rendering.permute(2, 0, 1), gt.squeeze(0))
-            print(loss)
             running_loss += loss.item()
             loss.backward()
             optimizer.step()
