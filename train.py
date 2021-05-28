@@ -141,10 +141,6 @@ if __name__ == "__main__":
             shading = (transport @ light).to(device)
             rendering = (albedo * shading * 255.0).to(device)
 
-            im = imageio.imsave(
-                "rendering.png", (rendering.detach().numpy()).astype(np.uint8),
-            )
-
             loss = criterion(rendering.permute(2, 0, 1), gt)
             running_loss += loss.item()
             loss.backward()
