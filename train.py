@@ -134,7 +134,7 @@ if __name__ == "__main__":
             light = light.squeeze(0)
             transport = transport.permute(1, 2, 0).to(device)
             albedo = albedo.permute(1, 2, 0).to(device)
-            shading = (transport @ light).to(device)
+            shading = torch.matmul(transport, light).to(device)
             rendering = (albedo * shading * 255.0).to(device)
             imageio.imsave("render_test.png", rendering.detach().cpu().numpy())
 
