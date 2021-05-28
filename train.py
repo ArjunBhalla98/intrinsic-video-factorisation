@@ -145,7 +145,7 @@ if __name__ == "__main__":
                 .squeeze(1)
                 .to(device)
             )
-            print(mask3.size(), mask9.size(), images.size())
+
             # for running relighting humans
             images = 2.0 * images - 1
             gt = (images * mask3).to(device)
