@@ -156,8 +156,8 @@ if __name__ == "__main__":
             )
 
             # for running relighting humans
-            # images = 2.0 * images - 1
             gt = (images * mask3).to(device)
+            images = 2.0 * images - 1
 
             transport, albedo, light = model(gt)
             transport = Variable((mask9 * transport).data[0], requires_grad=True)
@@ -169,6 +169,9 @@ if __name__ == "__main__":
             rendering = (albedo * shading * 255.0).to(device)
 
             imageio.imsave("rendering_test.png", rendering.detach().cpu().numpy())
+            imageio.imsave(
+                "gt_test.png", gt.squeeze(0).permute(1, 2, 0).detach().cpu().numpy()
+            )
             loss = criterion(rendering, gt.squeeze(0).permute(1, 2, 0))
             running_loss += loss.item()
             loss.backward()
