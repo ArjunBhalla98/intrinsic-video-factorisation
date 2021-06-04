@@ -157,7 +157,6 @@ if __name__ == "__main__":
 
             # for running relighting humans
             # images = 2.0 * images - 1
-            print(images.size(), mask3.size())
             gt = (images * mask3).to(device)
 
             transport, albedo, light = model(gt)
@@ -169,10 +168,6 @@ if __name__ == "__main__":
             shading = torch.matmul(transport, light).to(device)
             rendering = (albedo * shading * 255.0).to(device)
 
-            imageio.imsave("rendering_test.png", rendering.detach().cpu().numpy())
-            imageio.imsave(
-                "gt_test.png", gt.squeeze(0).permute(1, 2, 0).detach().cpu().numpy()
-            )
             loss = criterion(rendering.permute(2, 0, 1), gt.squeeze(0))
             running_loss += loss.item()
             loss.backward()
