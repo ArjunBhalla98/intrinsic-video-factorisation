@@ -1,5 +1,6 @@
 from PIL import Image
 import torch
+import wandb
 from torch.autograd import Variable
 import argparse
 import numpy as np
@@ -71,6 +72,10 @@ LOAD_PATH = args.load_state
 SAVE_PATH = args.save_state
 
 if __name__ == "__main__":
+    wandb.login()
+    wandb.init(project="video-factorisation", entity="arjunb")
+    config = wandb.config
+
     if torch.cuda.is_available():
         dev = f"cuda:{CUDA_DEV}"
     else:
@@ -164,7 +169,9 @@ if __name__ == "__main__":
             loss.backward()
             optimizer.step()
 
-        print(f"Loss: {running_loss / len(train_loader)}")
+        epoch_batch_loss = running_loss / len(train_loader)
+        wandb.log({"loss": epoch_batch_loss})
+        print(f"Loss: {epoch_batch_loss}")
 
     print("Training Finished")
 

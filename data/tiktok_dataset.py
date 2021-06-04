@@ -80,7 +80,7 @@ class TikTokDataset(Dataset):
 
     def __len__(self):
         # print(self.train_names[:4])
-        return 4
+        return 1
 
         if self.train:
             return len(self.train_images)
