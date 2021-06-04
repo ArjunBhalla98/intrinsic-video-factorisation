@@ -170,15 +170,11 @@ if __name__ == "__main__":
             rendering = (albedo * shading * 255.0).to(device)
 
             imageio.imsave("rendering_test.png", rendering.detach().cpu().numpy())
-            imageio.imsave(
-                "gt_test.png", gt.squeeze(0).permute(1, 2, 0).detach().cpu().numpy()
-            )
-            break
             loss = criterion(rendering, gt.squeeze(0).permute(1, 2, 0))
             running_loss += loss.item()
             loss.backward()
             optimizer.step()
-        break
+
         epoch_batch_loss = running_loss / len(train_loader)
         wandb.log({"loss": epoch_batch_loss})
         print(f"Loss: {epoch_batch_loss}")
