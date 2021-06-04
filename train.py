@@ -168,7 +168,7 @@ if __name__ == "__main__":
             shading = torch.matmul(transport, light).to(device)
             rendering = (albedo * shading * 255.0).to(device)
 
-            print((rendering.permute(2, 0, 1) - gt.squeeze(0)))
+            print((rendering.permute(2, 0, 1) - gt.squeeze(0)).sum())
             loss = criterion(rendering.permute(2, 0, 1), gt.squeeze(0))
             running_loss += loss.item()
             loss.backward()
