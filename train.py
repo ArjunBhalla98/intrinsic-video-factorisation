@@ -158,8 +158,9 @@ if __name__ == "__main__":
             # for running relighting humans
             gt = (images * mask3).to(device)
             images = 2.0 * images - 1
+            model_input = (images * mask3).to(device)
 
-            transport, albedo, light = model(gt)
+            transport, albedo, light = model(model_input)
             transport = Variable((mask9 * transport).data[0], requires_grad=True)
             albedo = Variable((albedo * mask3).data[0], requires_grad=True)
             light = Variable(light.data, requires_grad=True)
@@ -172,11 +173,12 @@ if __name__ == "__main__":
             imageio.imsave(
                 "gt_test.png", gt.squeeze(0).permute(1, 2, 0).detach().cpu().numpy()
             )
+            break
             loss = criterion(rendering, gt.squeeze(0).permute(1, 2, 0))
             running_loss += loss.item()
             loss.backward()
             optimizer.step()
-
+        break
         epoch_batch_loss = running_loss / len(train_loader)
         wandb.log({"loss": epoch_batch_loss})
         print(f"Loss: {epoch_batch_loss}")
