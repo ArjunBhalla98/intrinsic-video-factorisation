@@ -169,7 +169,7 @@ if __name__ == "__main__":
             rendering = (albedo * shading * 255.0).to(device)
 
             imageio.imsave("rendering_test.png", rendering.detach().cpu().numpy())
-            loss = criterion(rendering.permute(2, 0, 1), gt.squeeze(0))
+            loss = -criterion(rendering.permute(2, 0, 1), gt.squeeze(0))
             running_loss += loss.item()
             loss.backward()
             optimizer.step()
