@@ -156,7 +156,8 @@ if __name__ == "__main__":
             )
 
             # for running relighting humans
-            images = 2.0 * images - 1
+            # images = 2.0 * images - 1
+            print(images.size(), mask3.size())
             gt = (images * mask3).to(device)
 
             transport, albedo, light = model(gt)
