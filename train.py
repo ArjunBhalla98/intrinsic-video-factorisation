@@ -115,8 +115,8 @@ if __name__ == "__main__":
         model.load_state_dict(torch.load(LOAD_PATH))
 
     # Do the loss function / model thing for this too if needed
-    # optimizer = optim.Adam(model.parameters(), lr=LR, betas=(0.5, 0.999))
-    optimizer = optim.SGD(model.parameters(), lr=LR, momentum=0)
+    optimizer = optim.Adam(model.parameters(), lr=LR, betas=(0.9, 0.999))
+    # optimizer = optim.SGD(model.parameters(), lr=LR, momentum=0)
 
     print("Model and auxillary components initialized")
 
@@ -168,6 +168,7 @@ if __name__ == "__main__":
             shading = torch.matmul(transport, light).to(device)
             rendering = (albedo * shading * 255.0).to(device)
 
+            imageio.imsave("rendering_test.png", rendering.detach().cpu().numpy())
             loss = criterion(rendering.permute(2, 0, 1), gt.squeeze(0))
             running_loss += loss.item()
             loss.backward()
