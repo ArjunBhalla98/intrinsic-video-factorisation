@@ -1,6 +1,7 @@
 from PIL import Image
 import torch
 import wandb
+import torch.nn as nn
 from torch.autograd import Variable
 import argparse
 import numpy as np
@@ -13,6 +14,8 @@ import imageio
 
 # To change loss or model, adjust these:
 from loss.unsupervised_loss import l1_reconstruction_loss as criterion
+
+criterion = nn.MSELoss()
 from models.relighting_model import CNNAE2ResNet as training_model
 
 parser = argparse.ArgumentParser(description="Train a model on the TikTok Dataset.")
