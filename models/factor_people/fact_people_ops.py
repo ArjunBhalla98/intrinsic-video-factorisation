@@ -1,90 +1,12 @@
-# import sys
-# sys.path.append('/home/jin/workspace/SIGGRAPH_InsertHuman/human-inserting/codes/')
-
-# import torch
-# import torch.nn as nn
-# # from tensorboardX import SummaryWriter1
-# from torch.utils.tensorboard import SummaryWriter   
-# from torch.utils.data import DataLoader
-# from torch.nn import functional
-# import os
-# import time
-# import copy
-# import numpy as np
-# from tqdm import tqdm
-# from configparser import ConfigParser
-# import argparse
-# import cv2
-# from PIL import Image
-# from os.path import join as pjoin
-# from skimage.metrics import structural_similarity as ssim
-# from glob import glob
-
-from imports import *
+import torch
+import numpy as np
+from PIL import Image
 
 import networks.network_light as network_light
 import networks.network as network
 import networks.BilateralLayer as BlLayer
-import dataloaders.dataloader_test as dataloader
+import networks.testTools as testTools
 
-
-import functions.testTools as testTools
-import dataloaders.custom_transforms as custom_transforms
-
-
-# the wrapper that uses knowledge distillated model
-class FactorsPeople_KD():
-    def __init__(self, model_path):
-        from unify_net import UnifyNet
-        
-        self.model = UnifyNet('b3')
-        self.model.load_state_dict(torch.load(model_path))
-        
-        self.model.eval()
-        self.model.cuda()
-            
-        self.transform = transforms.ToTensor()
-        self.custom_transform = transforms.Compose([
-            custom_transforms.Resize_imgs(0.8,1.3), #0.8,1.3
-            custom_transforms.RandomCrop_imgs(crop_size=(512,768), nopad=False)])
-        self.image_transform = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        ])
-    
-    def __call__(self, image, light=None):
-        res = self.factor(image, light)
-        return res
-        
-    def factor(self, image, light=None):        
-#         image = self.image_transform(image).numpy().transpose(1,2,0)
-#         image = self.custom_transform([image])[0]
-#         image = self.transform(image).cuda().float()
-#         if len(image.shape) == 3:
-#             image = image.unsqueeze(0)
-            
-        factors = self.model(image, light)
-        
-        # change shadow
-        image_mask = (image>0).type(torch.FloatTensor).to(image.device)[:,0:1]
-        factors['shadow'] = factors['shadow']*0.#image_mask
-        return factors
-    
-    def reconstruct(self, image):
-        factors = self(image)
-        recon = testTools.tonemapping_tensor(factors['albedo']*factors['shading'])
-        return recon
-   
-    def relight_emptyscene(self, image, target_bg, target_light):
-        factors = self(image, target_light)
-        mask = (factors['albedo']>0.01).type(torch.FloatTensor).to(factors['albedo'].device)
-#         relighted = testTools.composition(factors['albedo'], factors['shading'], mask, target_bg, factors['shadow'])
-        relighted = testTools.composition_noshadow(factors['albedo'], factors['shading'], mask, target_bg)
-        
-        return relighted, factors
-        
-        
-    
 
 # define a class that takes input image and return factors and a reconstruction or relighting, or insertion
 class FactorsPeople():
@@ -102,45 +24,74 @@ class FactorsPeople():
         # load models
         self.albedo_net = network.Unet_Blurpooling_General(input_channel=7)
         self.albedo_net.cuda()
-        self.albedo_net.eval()
         checkpoint = torch.load(albedo_net_path)
         self.albedo_net.load_state_dict(checkpoint['model'])
         self.albedo_net.cuda_kernels()
 
         self.SH_model = network_light.LightNet_Hybrid(16, input_channel=4)
         self.SH_model.cuda()
-        self.SH_model.eval()
         checkpoint = torch.load(SH_model_path)
         self.SH_model.load_state_dict(checkpoint['model'])
 
         self.shading_net = network.Unet_Blurpooling_General_Light()
         self.shading_net.cuda()
-        self.shading_net.eval()
         checkpoint = torch.load(shading_net_path)
         self.shading_net.load_state_dict(checkpoint['model'])
         self.shading_net.cuda_kernels()
 
         self.self_shading_net = network.SepNetComplete_Shading(f_channel = 16)
         self.self_shading_net.cuda()
-        self.self_shading_net.eval()
         checkpoint = torch.load(self_shading_net_path)
         self.self_shading_net.load_state_dict(checkpoint['model'])
 
         self.shadow_net = network.Unet_Blurpooling_Shadow()
         self.shadow_net.cuda()
-        self.shadow_net.eval()
         checkpoint = torch.load(shadow_net_path)
         self.shadow_net.load_state_dict(checkpoint['model'])
         self.shadow_net.cuda_kernels()
 
         self.refine_rendering_net = network.Unet_Blurpooling_General_Light(input_channel=6)
         self.refine_rendering_net.cuda()
-        self.refine_rendering_net.eval()
         checkpoint = torch.load(refine_rendering_net_path)
         self.refine_rendering_net.load_state_dict(checkpoint['model'])
         self.refine_rendering_net.cuda_kernels()
 
         self.refine_net = BlLayer.BilateralSolver()
+
+    def set_eval(self):
+        self.albedo_net.eval()
+        self.SH_model.eval()
+        self.shading_net.eval()
+        self.self_shading_net.eval()
+        self.shadow_net.eval()
+        self.refine_rendering_net.eval()
+
+    def get_image(self, img_path, mask_path):
+        input_img_origin = np.array(Image.open(img_path))
+        input_mask_origin = np.array(Image.open(mask_path))
+        if input_mask_origin.shape[0:2] != input_img_origin.shape[0:2]:
+            input_img_origin = input_img_origin.transpose(1, 0, 2)
+            input_img_origin = input_img_origin[:,::-1,:]
+        if len(input_mask_origin.shape) > 2:
+            input_mask_origin = input_mask_origin[:,:,0]
+
+        input_img, input_mask, _ = testTools.ResizeImage(input_img_origin, input_mask_origin, None) 
+        input_mask = np.expand_dims(input_mask, axis=2)
+
+        img_shape = (768, 512)
+        human_mask = torch.Tensor(1, 1, img_shape[0], img_shape[1])
+        human_input = torch.Tensor(1, 3, img_shape[0], img_shape[1])
+
+        input_img = input_img / 255.
+        input_mask = input_mask / 255.
+
+        human_mask[0] = torch.FloatTensor(input_mask.transpose(2, 0, 1))
+        human_input[0] = torch.FloatTensor(input_img.transpose(2, 0, 1))
+
+        mask = human_mask.cuda()
+        tonemapped = human_input.cuda()
+        
+        return tonemapped, mask
         
     def get_lighting(self, image, mask, raw_output=False):
         est_ground, est_sun_map, est_sun_intensity, \
@@ -231,3 +182,28 @@ class FactorsPeople():
         refined = refined * mask + bg * est_shadow * (1 - mask)
         return refined
         
+
+
+if __name__ == "__main__":
+    img_file = '/data/human/dancing/selected_full/photo-1520013135029-3c324dc527a0.jpeg'
+    mask_file = '/data/human/dancing/selected_full/photo-1520013135029-3c324dc527a0_mask_manual.png'
+
+    model_dir = '/home/jin/workspace/SIGGRAPH_InsertHuman/'
+    all_dirs = {
+        'self_shading_net': model_dir + 'models/self_shading.pth',#/data/human-inserting/logs/sepnet_shading/sepnet_f16_lr4e-5_dssimonly'
+        'shading_net': model_dir + 'models/shading.pth',#/data/human-inserting/logs/sepnet_shading/unetblur_lr4e-5_dssimonly_noself'
+        'SH_model': model_dir + 'models/SH.pth',#/data/human-inserting/logs/sepnet_light_sh_single/hybrid_position0_map0.5'
+        'albedo_net': model_dir + 'models/albedo.pth',#/data/human-inserting/logs/sepnet_albedo/unetblur_l1_perp_w_shading'
+        'shadow_net': model_dir + 'models/shadow.pth',#/data/human-inserting/logs/sepnet_others/shadow_unetblur_l1loss'
+        'refine_rendering_net': model_dir + 'models/refine.pth',#/data/human-inserting/logs/sepnet_others/unetblur_relighting_refine_l2_perp'
+    }
+    factorspeople = FactorsPeople(all_dirs)
+
+    img, mask = factorspeople.get_image(img_file, mask_file)
+    with torch.no_grad():
+        pred_factors = factorspeople.factor(img.cuda(), mask.cuda())
+    print(pred_factors.keys())
+    print(pred_factors['light'].shape)
+    print(pred_factors['shading'].shape)
+    print(pred_factors['albedo'].shape)
+    print(pred_factors['shadow'].shape)
