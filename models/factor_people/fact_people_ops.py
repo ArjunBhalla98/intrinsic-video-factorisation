@@ -185,10 +185,10 @@ class FactorsPeople():
 
 
 if __name__ == "__main__":
-    img_file = '/data/human/dancing/selected_full/photo-1520013135029-3c324dc527a0.jpeg'
-    mask_file = '/data/human/dancing/selected_full/photo-1520013135029-3c324dc527a0_mask_manual.png'
+    img_file = '/phoenix/S3/ab2383/data/train_imgs/00110_0015.png'
+    mask_file = '/phoenix/S3/ab2383/data/train_imgs/00110_0015_mask.png'
 
-    model_dir = '/home/jin/workspace/SIGGRAPH_InsertHuman/'
+    model_dir = '/phoenix/S7/js2625/SIGGRAPH_InsertHuman/desktopmini/'
     all_dirs = {
         'self_shading_net': model_dir + 'models/self_shading.pth',#/data/human-inserting/logs/sepnet_shading/sepnet_f16_lr4e-5_dssimonly'
         'shading_net': model_dir + 'models/shading.pth',#/data/human-inserting/logs/sepnet_shading/unetblur_lr4e-5_dssimonly_noself'
