@@ -10,12 +10,10 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 from data.tiktok_dataset import TikTokDataset
-import imageio
+from models.factor_people.fact_people_ops import *
 
 # To change loss or model, adjust these:
 from loss.unsupervised_loss import l1_reconstruction_loss as criterion
-
-criterion = nn.MSELoss()
 from models.relighting_model import CNNAE2ResNet as training_model
 
 parser = argparse.ArgumentParser(description="Train a model on the TikTok Dataset.")
@@ -54,11 +52,21 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--batch", metavar="batch", help="Batch Size", type=int, default=32, required=False,
+    "--batch",
+    metavar="batch",
+    help="Batch Size",
+    type=int,
+    default=32,
+    required=False,
 )
 
 parser.add_argument(
-    "-lr", metavar="lr", help="Learning Rate", type=float, default=1e-3, required=False,
+    "-lr",
+    metavar="lr",
+    help="Learning Rate",
+    type=float,
+    default=1e-3,
+    required=False,
 )
 
 parser.add_argument(
@@ -114,9 +122,13 @@ if __name__ == "__main__":
     if LOAD_PATH:
         model.load_state_dict(torch.load(LOAD_PATH))
 
+    ##### PUT TASK SPECIFIC PRE-TRAINING THINGS HERE #####
+    all_dirs = get_model_dirs()
+    factorspeople = FactorsPeople(all_dirs)
+    ######################################################
+
     # Do the loss function / model thing for this too if needed
     optimizer = optim.Adam(model.parameters(), lr=LR, betas=(0.9, 0.999))
-    # optimizer = optim.SGD(model.parameters(), lr=LR, momentum=0)
 
     print("Model and auxillary components initialized")
 
@@ -130,47 +142,54 @@ if __name__ == "__main__":
             masks = data["masks"].squeeze(0)
             images = data["images"].squeeze(0)
 
+            print(data["img_paths"])
+            raise Exception
             images = images.to(device)
             masks = masks.to(device)
 
             optimizer.zero_grad()
-            mask3 = (
-                Variable(
-                    torch.from_numpy(
-                        np.repeat(masks.detach().cpu().numpy(), 3, axis=0)
-                    ),
-                    requires_grad=True,
-                )
-                .squeeze(1)
-                .to(device)
-            )
-            mask9 = (
-                Variable(
-                    torch.from_numpy(
-                        np.repeat(masks.detach().cpu().numpy(), 9, axis=0)
-                    ),
-                    requires_grad=True,
-                )
-                .squeeze(1)
-                .to(device)
-            )
+            #### PUT MODEL SPECIFIC FORWARD PASS CODE HERE ####
+            # mask3 = (
+            #     Variable(
+            #         torch.from_numpy(
+            #             np.repeat(masks.detach().cpu().numpy(), 3, axis=0)
+            #         ),
+            #         requires_grad=True,
+            #     )
+            #     .squeeze(1)
+            #     .to(device)
+            # )
+            # mask9 = (
+            #     Variable(
+            #         torch.from_numpy(
+            #             np.repeat(masks.detach().cpu().numpy(), 9, axis=0)
+            #         ),
+            #         requires_grad=True,
+            #     )
+            #     .squeeze(1)
+            #     .to(device)
+            # )
 
             # for running relighting humans
-            gt = (images * mask3).to(device)
-            images = 2.0 * images - 1
-            model_input = (images * mask3).to(device)
+            # gt = (images * mask3).to(device)
+            # images = 2.0 * images - 1
+            # model_input = (images * mask3).to(device)
+            # imageio.imsave("model_input.png", model_input.detach().squeeze(0))
+            # rendering = model(gt)
+            # rendering_save = rendering.detach() - torch.min(rendering.detach())
+            # rendering_save = rendering_save / torch.max(rendering_save)
 
-            transport, albedo, light = model(model_input)
-            transport = Variable((mask9 * transport).data[0], requires_grad=True)
-            albedo = Variable((albedo * mask3).data[0], requires_grad=True)
-            light = Variable(light.data, requires_grad=True)
-            transport = transport.permute(1, 2, 0).to(device)
-            albedo = albedo.permute(1, 2, 0).to(device)
-            shading = torch.matmul(transport, light).to(device)
-            rendering = (albedo * shading * 255.0).to(device)
+            # transport, albedo, light = model(model_input)
+            # transport = Variable((mask9 * transport).data[0], requires_grad=True)
+            # albedo = Variable((albedo * mask3).data[0], requires_grad=True)
+            # light = Variable(light.data, requires_grad=True)
+            # transport = transport.permute(1, 2, 0).to(device)
+            # albedo = albedo.permute(1, 2, 0).to(device)
+            # shading = torch.matmul(transport, light).to(device)
+            # rendering = (albedo * shading * 255.0).to(device)
+            ####################################################
 
-            imageio.imsave("rendering_test.png", rendering.detach().cpu().numpy())
-            loss = criterion(rendering, gt.squeeze(0).permute(1, 2, 0))
+            loss = criterion(rendering, gt)
             running_loss += loss.item()
             loss.backward()
             optimizer.step()

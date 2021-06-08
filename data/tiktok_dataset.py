@@ -20,7 +20,7 @@ class TikTokDataset(Dataset):
         squarize_size=None,
     ):
         """
-        Initialises the TikTok Dataset. This will return, upon "getitem", a sample that is 
+        Initialises the TikTok Dataset. This will return, upon "getitem", a sample that is
         temporally contiguous from a random video, of length sample_size. This function is built to
         "lazy load" so as not to clog up memory.
 
@@ -33,6 +33,8 @@ class TikTokDataset(Dataset):
         self.images = []
         self.masks = []
         self.names = []
+        self.image_paths = []
+        self.mask_paths = []
         self.transform = transform
         self.train = train
         self.sample_size = sample_size
@@ -68,15 +70,21 @@ class TikTokDataset(Dataset):
             )
 
             assert len(self.images) == len(self.masks), "Images Length != Masks Length"
+        self.image_paths = self.images[:]
+        self.mask_paths = self.masks[:]
 
         TRAIN_TEST_SPLIT = round(0.8 * len(self.images))
         self.train_images = self.images[:TRAIN_TEST_SPLIT]
         self.train_masks = self.masks[:TRAIN_TEST_SPLIT]
         self.train_names = self.names[:TRAIN_TEST_SPLIT]
+        self.train_image_paths = self.image_paths[:TRAIN_TEST_SPLIT]
+        self.train_mask_paths = self.mask_paths[:TRAIN_TEST_SPLIT]
 
         self.test_images = self.images[TRAIN_TEST_SPLIT:]
         self.test_masks = self.masks[TRAIN_TEST_SPLIT:]
         self.test_names = self.names[TRAIN_TEST_SPLIT:]
+        self.test_image_paths = self.image_paths[TRAIN_TEST_SPLIT:]
+        self.test_mask_paths = self.mask_paths[TRAIN_TEST_SPLIT:]
 
     def __len__(self):
         # print(self.train_names[:4])
@@ -95,10 +103,14 @@ class TikTokDataset(Dataset):
             video_imgs = self.train_images
             video_masks = self.train_masks
             video_names = self.train_names
+            image_paths = self.train_image_paths
+            mask_paths = self.train_mask_paths
         else:
             video_imgs = self.test_images
             video_masks = self.test_masks
             video_names = self.test_names
+            image_paths = self.test_image_paths
+            mask_paths = self.test_mask_paths
 
         images = np.array(
             list(
@@ -136,4 +148,10 @@ class TikTokDataset(Dataset):
                 dim=0,
             )
 
-        return {"images": images, "masks": masks, "names": video_names[idx]}
+        return {
+            "images": images,
+            "masks": masks,
+            "names": video_names[idx],
+            "img_paths": image_paths,
+            "mask_paths": mask_paths,
+        }

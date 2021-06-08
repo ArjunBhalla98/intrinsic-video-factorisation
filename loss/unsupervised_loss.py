@@ -18,3 +18,6 @@ def l1_loss(results):
 def l1_reconstruction_loss(predicted, gt):
     return torch.abs(predicted - gt).sum()
 
+
+def l2_mse_loss(predicted, gt):
+    return torch.nn.MSELoss()

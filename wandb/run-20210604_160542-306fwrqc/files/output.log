@@ -1,0 +1,1 @@
+ValueError: Image must be 2D (grayscale, RGB, or RGBA).
