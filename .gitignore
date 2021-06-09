@@ -3,3 +3,4 @@ output_imgs
 *.ipynb_checkpoints
 __pycache__
 *.pyc
+wandb

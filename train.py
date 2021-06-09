@@ -52,21 +52,11 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--batch",
-    metavar="batch",
-    help="Batch Size",
-    type=int,
-    default=32,
-    required=False,
+    "--batch", metavar="batch", help="Batch Size", type=int, default=32, required=False,
 )
 
 parser.add_argument(
-    "-lr",
-    metavar="lr",
-    help="Learning Rate",
-    type=float,
-    default=1e-3,
-    required=False,
+    "-lr", metavar="lr", help="Learning Rate", type=float, default=1e-3, required=False,
 )
 
 parser.add_argument(
@@ -142,13 +132,14 @@ if __name__ == "__main__":
             masks = data["masks"].squeeze(0)
             images = data["images"].squeeze(0)
 
-            print(data["img_paths"])
-            raise Exception
             images = images.to(device)
             masks = masks.to(device)
 
             optimizer.zero_grad()
             #### PUT MODEL SPECIFIC FORWARD PASS CODE HERE ####
+            img, mask = factorspeople.get_image(data["img_paths"], data["mask_paths"])
+            gt = img.detach() * mask.detach()
+            out = factorspeople.reconstruct(img, mask)
             # mask3 = (
             #     Variable(
             #         torch.from_numpy(
@@ -189,7 +180,7 @@ if __name__ == "__main__":
             # rendering = (albedo * shading * 255.0).to(device)
             ####################################################
 
-            loss = criterion(rendering, gt)
+            loss = criterion(out, gt)
             running_loss += loss.item()
             loss.backward()
             optimizer.step()

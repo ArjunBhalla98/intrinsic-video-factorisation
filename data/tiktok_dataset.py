@@ -152,6 +152,6 @@ class TikTokDataset(Dataset):
             "images": images,
             "masks": masks,
             "names": video_names[idx],
-            "img_paths": image_paths,
-            "mask_paths": mask_paths,
+            "img_paths": image_paths[idx],
+            "mask_paths": mask_paths[idx],
         }
