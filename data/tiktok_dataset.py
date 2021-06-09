@@ -87,9 +87,6 @@ class TikTokDataset(Dataset):
         self.test_mask_paths = self.mask_paths[TRAIN_TEST_SPLIT:]
 
     def __len__(self):
-        # print(self.train_names[:4])
-        return 1
-
         if self.train:
             return len(self.train_images)
         else:
