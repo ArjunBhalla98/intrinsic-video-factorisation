@@ -91,7 +91,7 @@ if __name__ == "__main__":
         device,
         transform=transform,
         sample_size=BATCH_SIZE,
-        squarize_size=1024,
+        # squarize_size=1024,
     )
     dataset_test = TikTokDataset(
         ROOT_DIR,
@@ -99,7 +99,7 @@ if __name__ == "__main__":
         train=False,
         transform=transform,
         sample_size=BATCH_SIZE,
-        squarize_size=1024,
+        # squarize_size=1024,
     )
     train_loader = DataLoader(dataset_train, shuffle=True)
     test_loader = DataLoader(dataset_test, shuffle=True)
