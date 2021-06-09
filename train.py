@@ -13,7 +13,7 @@ from data.tiktok_dataset import TikTokDataset
 from models.factor_people.fact_people_ops import *
 
 # To change loss or model, adjust these:
-from loss.unsupervised_loss import l2_mse_loss as criterion
+from loss.unsupervised_loss import l1_reconstruction_loss as criterion
 from models.relighting_model import CNNAE2ResNet as training_model
 
 parser = argparse.ArgumentParser(description="Train a model on the TikTok Dataset.")
