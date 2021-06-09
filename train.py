@@ -118,7 +118,15 @@ if __name__ == "__main__":
     ######################################################
 
     # Do the loss function / model thing for this too if needed
-    optimizer = optim.Adam(model.parameters(), lr=LR, betas=(0.9, 0.999))
+    params = (
+        list(factorspeople.self_shading_net.parameters())
+        + list(factorspeople.shading_net.parameters())
+        + list(factorspeople.SH_model.parameters())
+        + list(factorspeople.albedo_net.parameters())
+        + list(factorspeople.shadow_net.parameters())
+        + list(factorspeople.refine_rendering_net)
+    )
+    optimizer = optim.Adam(params, lr=LR, betas=(0.9, 0.999))
 
     print("Model and auxillary components initialized")
 
