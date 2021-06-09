@@ -137,7 +137,9 @@ if __name__ == "__main__":
 
             optimizer.zero_grad()
             #### PUT MODEL SPECIFIC FORWARD PASS CODE HERE ####
-            img, mask = factorspeople.get_image(data["img_paths"], data["mask_paths"])
+            img, mask = factorspeople.get_image(
+                data["img_paths"].pop(), data["mask_paths"].pop()
+            )
             gt = img.detach() * mask.detach()
             out = factorspeople.reconstruct(img, mask)
             # mask3 = (
