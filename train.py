@@ -148,7 +148,7 @@ if __name__ == "__main__":
             img, mask = factorspeople.get_image(
                 data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
             )
-            if not img or not mask:
+            if img == None or mask == None:
                 continue
             gt = img.detach() * mask.detach()
             out = factorspeople.reconstruct(img, mask)[0]
