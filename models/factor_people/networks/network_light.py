@@ -643,7 +643,7 @@ class LightNet_Hybrid(nn.Module):
         return ground_shlight, sun, sun_para
 
     def forward(self, human, mask, gth_ground_shlight=None, crop_mask=None):
-        print(self.human_conv1.weights.grad)
+        print(self.human_conv1[0].weight.grad)
         if crop_mask is None:
             all_f = self.encode_human_bg(torch.cat([human, mask], dim=1))
             human_f = self.encode_human(torch.cat([human * mask, mask], dim=1))
