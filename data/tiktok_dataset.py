@@ -42,7 +42,7 @@ class TikTokDataset(Dataset):
         appended_path = root_dir
 
         for folder in os.listdir(appended_path)[:40]:
-            if not os.path.isdir(appended_path + folder):
+            if not os.path.isdir(appended_path + folder) or "234" in folder:
                 continue
 
             video_imgs = glob.glob(f"{appended_path}/{folder}/images/*.png")
