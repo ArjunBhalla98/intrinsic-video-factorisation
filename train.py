@@ -141,7 +141,7 @@ if __name__ == "__main__":
                 data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
             )
             gt = img.detach() * mask.detach()
-            out = factorspeople.reconstruct(img, mask)
+            out = factorspeople.reconstruct(img, mask)[0]
             # mask3 = (
             #     Variable(
             #         torch.from_numpy(
