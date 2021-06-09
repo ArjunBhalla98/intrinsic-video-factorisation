@@ -124,7 +124,7 @@ if __name__ == "__main__":
         + list(factorspeople.SH_model.parameters())
         + list(factorspeople.albedo_net.parameters())
         + list(factorspeople.shadow_net.parameters())
-        + list(factorspeople.refine_rendering_net)
+        + list(factorspeople.refine_rendering_net.parameters())
     )
     optimizer = optim.Adam(params, lr=LR, betas=(0.9, 0.999))
 
