@@ -143,11 +143,11 @@ class FactorsPeople:
         est_albedo = torch.clamp(est_albedo, 0.0, 1.0)
         est_albedo = est_albedo * mask.cuda()
 
-        shading_map = torch.sum(shading, dim=1, keepdim=True)  # ???
-        shading_map = shading_map / torch.clamp(shading_map.max(), min=1e-5)
-        est_albedo = (
-            self.refine_net.apply(est_albedo, est_albedo, shading_map) * mask
-        )  # **** ??
+        # shading_map = torch.sum(shading, dim=1, keepdim=True)  # ???
+        # shading_map = shading_map / torch.clamp(shading_map.max(), min=1e-5)
+        # est_albedo = (
+        #     self.refine_net.apply(est_albedo, est_albedo, shading_map) * mask
+        # )  # **** ??
         return est_albedo
 
     def get_shadow(self, image, mask, light=None):
