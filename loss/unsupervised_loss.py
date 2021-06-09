@@ -20,4 +20,6 @@ def l1_reconstruction_loss(predicted, gt):
 
 
 def l2_mse_loss(predicted, gt):
-    return torch.nn.MSELoss()
+    criterion = torch.nn.MSELoss()
+    loss = criterion(predicted, gt)
+    return loss
