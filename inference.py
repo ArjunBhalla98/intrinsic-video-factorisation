@@ -102,13 +102,13 @@ if __name__ == "__main__":
         gt = (img.detach() * mask.detach()).squeeze().permute(1, 2, 0)
         out = (factorspeople.reconstruct(img, mask)[0]).squeeze().permute(1, 2, 0)
 
-        print(gt.size(), out.size())
+        print(torch.min(out), torch.max(out))
         imageio.imwrite(
-            SAVE_DIR + "/" + name, out.detach().cpu().numpy().astype(np.uint8),
+            SAVE_DIR + "/" + name, out.detach().cpu().numpy(),
         )
 
         imageio.imwrite(
-            SAVE_DIR + "/" + "gt_" + name, gt.detach().cpu().numpy().astype(np.uint8),
+            SAVE_DIR + "/" + "gt_" + name, gt.detach().cpu().numpy(),
         )
         # imsave(name, rendering.detach().cpu().numpy())
 
