@@ -206,4 +206,13 @@ if __name__ == "__main__":
     print("Training Finished")
 
     if SAVE_PATH:
-        torch.save(model.state_dict(), SAVE_PATH)
+        # torch.save(model.state_dict(), SAVE_PATH)
+        torch.save(factorspeople.self_shading_net.state_dict(), SAVE_PATH + "ssn.pth")
+        torch.save(factorspeople.shading_net.state_dict(), SAVE_PATH + "sn.pth")
+        torch.save(factorspeople.SH_model.state_dict(), SAVE_PATH + "sh.pth")
+        torch.save(factorspeople.albedo_net.state_dict(), SAVE_PATH + "albedo.pth")
+        torch.save(factorspeople.shadow_net.state_dict(), SAVE_PATH + "shadow.pth")
+        torch.save(
+            factorspeople.refine_rendering_net.state_dict(), SAVE_PATH + "rrn.pth"
+        )
+

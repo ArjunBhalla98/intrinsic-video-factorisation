@@ -7,6 +7,7 @@ import torchvision.transforms as transforms
 from matplotlib.pyplot import imsave
 import imageio
 from data.tiktok_dataset import TikTokDataset
+from models.factor_people.fact_people_ops import *
 
 # To change loss or model, adjust these:
 from models.relighting_model import CNNAE2ResNet as eval_model
@@ -66,10 +67,14 @@ if __name__ == "__main__":
     print("Data Loaded")
 
     # Handle all model related stuff
-    model = eval_model()
-    model = model.to(device)
-    model.eval()
-    model.train_dropout = False  # relighting humans
+    # model = eval_model()
+    # model = model.to(device)
+    # model.eval()
+
+    ##### PUT TASK SPECIFIC PRE-TRAINING THINGS HERE #####
+    all_dirs = get_model_dirs()
+    factorspeople = FactorsPeople(all_dirs)
+    # model.train_dropout = False  # relighting humans
 
     if LOAD_PATH:
         model.load_state_dict(torch.load(LOAD_PATH))
@@ -86,17 +91,6 @@ if __name__ == "__main__":
         masks = masks.to(device)
 
         # for running relighting humans
-        images = 2.0 * images - 1
-        gt = (images * masks).to(device)
-
-        transport, albedo, light = model(gt)
-        transport = transport.view(1024, 1024, 9).to(device)
-        albedo = albedo.permute(0, 2, 3, 1).to(device)
-        shading = (transport @ light.squeeze()).view(1024, 1024, 3).to(device)
-        rendering = (albedo.squeeze() * shading).to(device)
-        rendering += torch.abs(torch.min(rendering))
-        rendering = rendering / torch.max(rendering)
-        rendering *= 255.0
 
         imageio.imwrite(
             SAVE_DIR + "/" + name, rendering.detach().cpu().numpy().astype(np.uint8)
@@ -104,6 +98,3 @@ if __name__ == "__main__":
         # imsave(name, rendering.detach().cpu().numpy())
 
     print(f"Eval Finished - images are in {SAVE_DIR}")
-
-    if SAVE_DIR:
-        torch.save(model.state_dict(), SAVE_DIR)
