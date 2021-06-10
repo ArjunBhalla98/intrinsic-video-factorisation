@@ -99,16 +99,17 @@ if __name__ == "__main__":
         except Exception:
             continue
 
-        gt = (img.detach() * mask.detach()).squeeze().permute(1, 2, 0)
-        out = (factorspeople.reconstruct(img, mask)[0]).squeeze().permute(1, 2, 0)
-
-        print(torch.min(out), torch.max(out))
-        imageio.imwrite(
-            SAVE_DIR + "/" + name, out.detach().cpu().numpy(),
+        gt = (img.detach() * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
+        out = (
+            (factorspeople.reconstruct(img, mask)[0] * 255.0).squeeze().permute(1, 2, 0)
         )
 
         imageio.imwrite(
-            SAVE_DIR + "/" + "gt_" + name, gt.detach().cpu().numpy(),
+            SAVE_DIR + "/" + name, out.detach().cpu().numpy().astype(np.uint8),
+        )
+
+        imageio.imwrite(
+            SAVE_DIR + "/" + "gt_" + name, gt.detach().cpu().numpy().astype(np.uint8),
         )
         # imsave(name, rendering.detach().cpu().numpy())
 
