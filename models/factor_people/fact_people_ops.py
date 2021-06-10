@@ -68,6 +68,18 @@ class FactorsPeople:
         self.shadow_net.eval()
         self.refine_rendering_net.eval()
 
+    def load_model_state(self, model_state_dict):
+        self.self_shading_net.load_state_dict(
+            torch.load(model_state_dict["self_shading_net"])
+        )
+        self.shading_net.load_state_dict(torch.load(model_state_dict["shading_net"]))
+        self.SH_model.load_state_dict(torch.load(model_state_dict["SH_model"]))
+        self.albedo_net.load_state_dict(torch.load(model_state_dict["albedo_net"]))
+        self.shadow_net.load_state_dict(torch.load(model_state_dict["shadow_net"]))
+        self.refine_rendering_net.load_state_dict(
+            torch.load(model_state_dict["refine_rendering_net"])
+        )
+
     def get_image(self, img_path, mask_path):
         input_img_origin = np.array(Image.open(img_path))
         input_mask_origin = np.array(Image.open(mask_path))
@@ -230,7 +242,9 @@ class FactorsPeople:
 
 def get_model_dirs():
     """
-    Just returns the path to the server where the larger models are kept.
+    Just returns the dict with paths on the server where the larger models are kept.
+    Important: It is easiest to initialise this class with this dict, then
+    use factorpeople.load_model_state() with the new pth files
     """
     model_dir = "/phoenix/S7/js2625/SIGGRAPH_InsertHuman/desktopmini/"
     all_dirs = {

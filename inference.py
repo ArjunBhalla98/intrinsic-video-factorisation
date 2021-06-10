@@ -67,7 +67,7 @@ if __name__ == "__main__":
     model.eval()
 
     ##### PUT TASK SPECIFIC PRE-TRAINING THINGS HERE #####
-    all_dirs = {
+    model_states_trained = {
         "self_shading_net": "models/states/fact_people_mse_ssn.pth",
         "shading_net": "models/states/fact_people_mse_sn.pth",
         "SH_model": "models/states/fact_people_mse_sh.pth",
@@ -75,7 +75,9 @@ if __name__ == "__main__":
         "shadow_net": "models/states/fact_people_mse_shadow.pth",
         "refine_rendering_net": "models/states/fact_people_mse_rrn.pth",
     }
+    all_dirs = get_model_dirs()
     factorspeople = FactorsPeople(all_dirs)
+    factorspeople.load_model_state(model_states_trained)
     factorspeople.set_eval()
     # model.train_dropout = False  # relighting humans
 
