@@ -56,24 +56,27 @@ if __name__ == "__main__":
     # Handle all data loading and related stuff
     transform = transforms.Compose([transforms.ToTensor()])
     dataset_test = TikTokDataset(
-        ROOT_DIR,
-        device,
-        train=False,
-        transform=transform,
-        sample_size=BATCH_SIZE,
-        squarize_size=1024,
+        ROOT_DIR, device, train=False, transform=transform, sample_size=BATCH_SIZE,
     )
     test_loader = DataLoader(dataset_test, shuffle=True)
     print("Data Loaded")
 
     # Handle all model related stuff
-    # model = eval_model()
-    # model = model.to(device)
-    # model.eval()
+    model = eval_model()
+    model = model.to(device)
+    model.eval()
 
     ##### PUT TASK SPECIFIC PRE-TRAINING THINGS HERE #####
-    all_dirs = get_model_dirs()
+    all_dirs = {
+        "self_shading_net": "models/states/fact_people_mse_ssn.pth",
+        "shading_net": "models/states/fact_people_mse_sn.pth",
+        "SH_model": "models/states/fact_people_mse_sh.pth",
+        "albedo_net": "models/states/fact_people_mse_albedo.pth",
+        "shadow_net": "models/states/fact_people_mse_shadow.pth",
+        "refine_rendering_net": "models/states/fact_people_mse_rrn.pth",
+    }
     factorspeople = FactorsPeople(all_dirs)
+    factorspeople.set_eval()
     # model.train_dropout = False  # relighting humans
 
     if LOAD_PATH:
@@ -87,13 +90,22 @@ if __name__ == "__main__":
         images = data["images"].squeeze(0)
         name = data["names"].pop()[0]
 
-        images = images.to(device)
-        masks = masks.to(device)
+        try:
+            img, mask = factorspeople.get_image(
+                data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
+            )
+        except Exception:
+            continue
 
-        # for running relighting humans
+        gt = img.detach() * mask.detach()
+        out = factorspeople.reconstruct(img, mask)[0]
 
         imageio.imwrite(
-            SAVE_DIR + "/" + name, rendering.detach().cpu().numpy().astype(np.uint8)
+            SAVE_DIR + "/" + name, out.detach().cpu().numpy().astype(np.uint8)
+        )
+
+        imageio.imwrite(
+            SAVE_DIR + "/" + "gt_" + name, gt.detach().cpu().numpy().astype(np.uint8)
         )
         # imsave(name, rendering.detach().cpu().numpy())
 
