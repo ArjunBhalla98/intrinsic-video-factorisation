@@ -102,6 +102,7 @@ if __name__ == "__main__":
         gt = img.detach() * mask.detach()
         out = factorspeople.reconstruct(img, mask)[0]
 
+        print(gt.size(), out.size())
         imageio.imwrite(
             SAVE_DIR + "/" + name, out.detach().cpu().numpy().astype(np.uint8)
         )
