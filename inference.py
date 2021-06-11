@@ -100,11 +100,10 @@ if __name__ == "__main__":
             continue
 
         gt = (img.detach() * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
-        out = (
-            (factorspeople.reconstruct(img, mask)[0] * mask.detach() * 255.0)
-            .squeeze()
-            .permute(1, 2, 0)
-        )
+        reconstruction, factors = factorspeople.reconstruct(img, mask)
+        out = (reconstruction * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
+        light = factors["light"].squeeze(0).permute(1, 2, 0) * 255.0
+        albedo = factors["albedo"].squeeze(0).permute(1, 2, 0) * 255.0
 
         imageio.imwrite(
             SAVE_DIR + "/" + name, out.detach().cpu().numpy().astype(np.uint8),
@@ -112,6 +111,16 @@ if __name__ == "__main__":
 
         imageio.imwrite(
             SAVE_DIR + "/" + "gt_" + name, gt.detach().cpu().numpy().astype(np.uint8),
+        )
+
+        imageio.imwrite(
+            SAVE_DIR + "/" + "light_" + name,
+            light.detach().cpu().numpy().astype(np.uint8),
+        )
+
+        imageio.imwrite(
+            SAVE_DIR + "/" + "albedo_" + name,
+            albedo.detach().cpu().numpy().astype(np.uint8),
         )
         # imsave(name, rendering.detach().cpu().numpy())
 
