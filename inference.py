@@ -58,7 +58,7 @@ if __name__ == "__main__":
     dataset_test = TikTokDataset(
         ROOT_DIR, device, train=False, transform=transform, sample_size=BATCH_SIZE,
     )
-    test_loader = DataLoader(dataset_test, shuffle=True)
+    test_loader = DataLoader(dataset_test)
     print("Data Loaded")
 
     # Handle all model related stuff
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     }
     all_dirs = get_model_dirs()
     factorspeople = FactorsPeople(all_dirs)
-    factorspeople.load_model_state(model_states_trained)
+    # factorspeople.load_model_state(model_states_trained)
     factorspeople.set_eval()
     # model.train_dropout = False  # relighting humans
 
@@ -101,7 +101,9 @@ if __name__ == "__main__":
 
         gt = (img.detach() * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
         out = (
-            (factorspeople.reconstruct(img, mask)[0] * 255.0).squeeze().permute(1, 2, 0)
+            (factorspeople.reconstruct(img, mask)[0] * mask.detach() * 255.0)
+            .squeeze()
+            .permute(1, 2, 0)
         )
 
         imageio.imwrite(
