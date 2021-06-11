@@ -77,7 +77,7 @@ if __name__ == "__main__":
     }
     all_dirs = get_model_dirs()
     factorspeople = FactorsPeople(all_dirs)
-    # factorspeople.load_model_state(model_states_trained)
+    factorspeople.load_model_state(model_states_trained)
     factorspeople.set_eval()
     # model.train_dropout = False  # relighting humans
 
@@ -102,7 +102,7 @@ if __name__ == "__main__":
         gt = (img.detach() * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
         reconstruction, factors = factorspeople.reconstruct(img, mask)
         out = (reconstruction * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
-        light = factors["light"].squeeze(0).permute(1, 2, 0) * 255.0
+        light = factors["shading"].squeeze(0).permute(1, 2, 0) * 255.0
         albedo = factors["albedo"].squeeze(0).permute(1, 2, 0) * 255.0
 
         imageio.imwrite(
