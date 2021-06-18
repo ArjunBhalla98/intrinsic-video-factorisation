@@ -102,8 +102,9 @@ if __name__ == "__main__":
         gt = (img.detach() * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
         reconstruction, factors = factorspeople.reconstruct(img, mask)
         out = (reconstruction * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
-        shading = factors["shading"].squeeze(0).permute(1, 2, 0) * 255.0
-        shading /= torch.max(shading)
+        shading = (
+            factors["shading"].squeeze(0).permute(1, 2, 0).mean(2, keepdim=True) * 255.0
+        )
         albedo = factors["albedo"].squeeze(0).permute(1, 2, 0) * 255.0
 
         imageio.imwrite(
