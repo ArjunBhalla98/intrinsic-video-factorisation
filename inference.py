@@ -113,9 +113,10 @@ if __name__ == "__main__":
             shading_np = shading.detach().cpu().numpy()
             albedo_np = albedo.detach().cpu().numpy()
 
-            np.save(SAVE_DIR + "/" + name, out_np)
-            np.save(SAVE_DIR + "/gt_" + name, gt_np)
-            np.save(SAVE_DIR + "/shading_" + name, shading_np)
+            np.save(SAVE_DIR + "/" + name + ".npy", out_np)
+            np.save(SAVE_DIR + "/gt_" + name + ".npy", gt_np)
+            np.save(SAVE_DIR + "/shading_" + name + ".npy", shading_np)
+            np.save(SAVE_DIR + "/albedo_" + name + ".npy", albedo_np)
 
             imageio.imwrite(
                 SAVE_DIR + "/" + name, out_np.astype(np.uint8),
