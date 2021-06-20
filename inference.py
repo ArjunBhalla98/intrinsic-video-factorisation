@@ -104,7 +104,7 @@ if __name__ == "__main__":
         out = (reconstruction * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
         if SAVE_DIR:
             out_np = out.detach().cpu().numpy()
-            gt_np = gt.detach.cpu().numpy()
+            gt_np = gt.detach().cpu().numpy()
             shading = (
                 factors["shading"].squeeze(0).permute(1, 2, 0).mean(2, keepdim=True)
                 * 255.0
