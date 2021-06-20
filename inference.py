@@ -102,28 +102,36 @@ if __name__ == "__main__":
         gt = (img.detach() * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
         reconstruction, factors = factorspeople.reconstruct(img, mask)
         out = (reconstruction * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
-        shading = (
-            factors["shading"].squeeze(0).permute(1, 2, 0).mean(2, keepdim=True) * 255.0
-        )
-        albedo = factors["albedo"].squeeze(0).permute(1, 2, 0) * 255.0
+        if SAVE_DIR:
+            out_np = out.detach().cpu().numpy()
+            gt_np = gt.detach.cpu().numpy()
+            shading = (
+                factors["shading"].squeeze(0).permute(1, 2, 0).mean(2, keepdim=True)
+                * 255.0
+            )
+            albedo = factors["albedo"].squeeze(0).permute(1, 2, 0) * 255.0
+            shading_np = shading.detach().cpu().numpy()
+            albedo_np = albedo.detach().cpu().numpy()
 
-        imageio.imwrite(
-            SAVE_DIR + "/" + name, out.detach().cpu().numpy().astype(np.uint8),
-        )
+            np.save(SAVE_DIR + "/" + name, out_np)
+            np.save(SAVE_DIR + "/gt_" + name, gt_np)
+            np.save(SAVE_DIR + "/shading_" + name, shading_np)
 
-        imageio.imwrite(
-            SAVE_DIR + "/" + "gt_" + name, gt.detach().cpu().numpy().astype(np.uint8),
-        )
+            imageio.imwrite(
+                SAVE_DIR + "/" + name, out_np.astype(np.uint8),
+            )
 
-        imageio.imwrite(
-            SAVE_DIR + "/" + "shading_" + name,
-            shading.detach().cpu().numpy().astype(np.uint8),
-        )
+            imageio.imwrite(
+                SAVE_DIR + "/" + "gt_" + name, gt_np.astype(np.uint8),
+            )
 
-        imageio.imwrite(
-            SAVE_DIR + "/" + "albedo_" + name,
-            albedo.detach().cpu().numpy().astype(np.uint8),
-        )
-        # imsave(name, rendering.detach().cpu().numpy())
+            imageio.imwrite(
+                SAVE_DIR + "/" + "shading_" + name, shading_np.astype(np.uint8),
+            )
+
+            imageio.imwrite(
+                SAVE_DIR + "/" + "albedo_" + name, albedo_np.astype(np.uint8),
+            )
+            # imsave(name, rendering.detach().cpu().numpy())
 
     print(f"Eval Finished - images are in {SAVE_DIR}")
