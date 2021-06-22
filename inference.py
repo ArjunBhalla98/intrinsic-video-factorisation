@@ -105,8 +105,10 @@ if __name__ == "__main__":
         if SAVE_DIR:
             out_np = out.detach().cpu().numpy()
             gt_np = gt.detach().cpu().numpy()
-            shading = factors["shading"].squeeze(0).permute(1, 2, 0) * 255.0
-            albedo = factors["albedo"].squeeze(0).permute(1, 2, 0) * 255.0
+            shading = factors["shading"].squeeze(0).permute(1, 2, 0)
+            shading = shading / shading.max() * 255.0
+            albedo = factors["albedo"].squeeze(0).permute(1, 2, 0)
+            albedo = albedo / albedo.max() * 255.0
             shading_np = shading.detach().cpu().numpy()
             albedo_np = albedo.detach().cpu().numpy()
             name_noext = name[: name.find(".")]
