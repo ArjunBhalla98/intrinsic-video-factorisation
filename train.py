@@ -115,6 +115,12 @@ if __name__ == "__main__":
     ##### PUT TASK SPECIFIC PRE-TRAINING THINGS HERE #####
     all_dirs = get_model_dirs()
     factorspeople = FactorsPeople(all_dirs)
+
+    static_factor_model = FactorsPeople(all_dirs)
+    static_factor_model.set_eval()
+    shading_albedo_loss = nn.L1Loss()
+    shading_lambda = 1
+    albedo_lambda = 1
     ######################################################
 
     # Do the loss function / model thing for this too if needed
@@ -153,7 +159,20 @@ if __name__ == "__main__":
                 continue
 
             gt = img.detach() * mask.detach()
-            out = factorspeople.reconstruct(img, mask)[0]
+            out, factors = factorspeople.reconstruct(img, mask)
+            _, static_factors = static_factor_model.reconstruct(img, mask)
+            static_shading = static_factors["shading"]
+            static_shading = static_shading / static_shading.max() * 255.0
+            static_albedo = static_factors["albedo"]
+            static_albedo = static_albedo / static_albedo.max() * 255.0
+
+            shading = factors["shading"]
+            shading = shading / shading.max() * 255.0
+            albedo = factors["albedo"]
+            albedo = albedo / albedo.max() * 255.0
+
+            shading_loss = shading_albedo_loss(static_shading, shading) * shading_lambda
+            albedo_loss = shading_albedo_loss(static_albedo, albedo) * albedo_lambda
             # mask3 = (
             #     Variable(
             #         torch.from_numpy(
@@ -194,7 +213,7 @@ if __name__ == "__main__":
             # rendering = (albedo * shading * 255.0).to(device)
             ####################################################
 
-            loss = criterion(out, gt)
+            loss = criterion(out, gt) + shading_loss + albedo_loss
             running_loss += loss.item()
             loss.backward()
             optimizer.step()
