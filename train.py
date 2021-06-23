@@ -217,9 +217,9 @@ if __name__ == "__main__":
             running_loss += loss.item()
             loss.backward()
             optimizer.step()
+            wandb.log({"loss": loss})
 
         epoch_batch_loss = running_loss / len(train_loader)
-        wandb.log({"loss": epoch_batch_loss})
         print(f"Loss: {epoch_batch_loss}")
 
     print("Training Finished")
