@@ -73,6 +73,7 @@ LOAD_PATH = args.load_state
 SAVE_PATH = args.save_state
 
 if __name__ == "__main__":
+    torch.cuda.empty_cache()
     wandb.login()
     wandb.init(project="video-factorisation", entity="arjunb")
     config = wandb.config
