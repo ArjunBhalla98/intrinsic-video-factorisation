@@ -68,12 +68,12 @@ if __name__ == "__main__":
 
     ##### PUT TASK SPECIFIC PRE-TRAINING THINGS HERE #####
     model_states_trained = {
-        "self_shading_net": "models/states/fact_people_mse_ssn.pth",
-        "shading_net": "models/states/fact_people_mse_sn.pth",
-        "SH_model": "models/states/fact_people_mse_sh.pth",
-        "albedo_net": "models/states/fact_people_mse_albedo.pth",
-        "shadow_net": "models/states/fact_people_mse_shadow.pth",
-        "refine_rendering_net": "models/states/fact_people_mse_rrn.pth",
+        "self_shading_net": "models/states/shad_alb_reg_ssn.pth",
+        "shading_net": "models/states/shad_alb_reg_sn.pth",
+        "SH_model": "models/states/shad_alb_reg_sh.pth",
+        "albedo_net": "models/states/shad_alb_reg_albedo.pth",
+        "shadow_net": "models/states/shad_alb_reg_shadow.pth",
+        "refine_rendering_net": "models/states/shad_alb_reg_rrn.pth",
     }
     all_dirs = get_model_dirs()
     factorspeople = FactorsPeople(all_dirs)
