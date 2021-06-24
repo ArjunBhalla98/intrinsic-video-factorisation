@@ -121,7 +121,7 @@ if __name__ == "__main__":
     static_factor_model.set_eval()
     shading_albedo_loss = nn.MSELoss()
     shading_lambda = 0.1
-    albedo_lambda = 1
+    albedo_lambda = 0.1
     ######################################################
 
     # Do the loss function / model thing for this too if needed
@@ -164,11 +164,17 @@ if __name__ == "__main__":
             _, static_factors = static_factor_model.reconstruct(img, mask)
             static_shading = static_factors["shading"]
             static_shading = static_shading / static_shading.max() * 255.0
+            static_albedo = static_factors["albedo"]
+            static_albedo = static_albedo / static_albedo.max() * 255.0
 
             shading = factors["shading"]
             shading = shading / shading.max() * 255.0
 
+            albedo = factors["albedo"]
+            albedo = albedo / albedo.max() * 255.0
+
             shading_loss = shading_albedo_loss(static_shading, shading) * shading_lambda
+            albedo_loss = shading_albedo_loss(static_albedo, albedo) * albedo_lambda
             # mask3 = (
             #     Variable(
             #         torch.from_numpy(
@@ -209,11 +215,13 @@ if __name__ == "__main__":
             # rendering = (albedo * shading * 255.0).to(device)
             ####################################################
 
-            loss = criterion(out, gt) + shading_loss
+            loss = criterion(out, gt) + shading_loss + albedo_loss
             running_loss += loss.item()
             loss.backward()
             optimizer.step()
-            wandb.log({"loss": loss})
+            wandb.log(
+                {"loss": loss, "shading_loss": shading_loss, "albedo_loss": albedo_loss}
+            )
 
         epoch_batch_loss = running_loss / len(train_loader)
         print(f"Loss: {epoch_batch_loss}")
