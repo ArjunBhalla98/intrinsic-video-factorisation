@@ -119,7 +119,7 @@ if __name__ == "__main__":
     static_factor_model = FactorsPeople(all_dirs)
     static_factor_model.set_eval()
     shading_albedo_loss = nn.MSELoss()
-    shading_lambda = 1
+    shading_lambda = 0.1
     albedo_lambda = 1
     ######################################################
 
