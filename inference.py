@@ -2,6 +2,8 @@ import torch
 import argparse
 from tqdm import tqdm
 import numpy as np
+import torch.nn as nn
+import wandb
 from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 from matplotlib.pyplot import imsave
@@ -32,10 +34,14 @@ parser.add_argument(
     required=False,
 )
 
-parser.add_argument("--save_dir", help="Path to save images", type=str, required=True)
+parser.add_argument("--save_dir", help="Path to save images", type=str, required=False)
 
 parser.add_argument(
     "--dev", help="Cuda device if using GPU", type=str, default="0", required=False
+)
+
+parser.add_argument(
+    "--log", help="Log if required on wandb", type=bool, default=False, required=False
 )
 
 args = parser.parse_args()
@@ -43,6 +49,7 @@ ROOT_DIR = args.root_dir
 CUDA_DEV = args.dev
 LOAD_PATH = args.load_state
 SAVE_DIR = args.save_dir
+LOG = args.log
 BATCH_SIZE = 1
 
 if __name__ == "__main__":
@@ -66,7 +73,7 @@ if __name__ == "__main__":
     model = model.to(device)
     model.eval()
 
-    ##### PUT TASK SPECIFIC PRE-TRAINING THINGS HERE #####
+    ##### PUT TASK SPECIFIC PRE-INFERENCE THINGS HERE #####
     model_states_trained = {
         "self_shading_net": "models/states/shad_alb_reg_ssn.pth",
         "shading_net": "models/states/shad_alb_reg_sn.pth",
@@ -79,12 +86,19 @@ if __name__ == "__main__":
     factorspeople = FactorsPeople(all_dirs)
     factorspeople.load_model_state(model_states_trained)
     factorspeople.set_eval()
+
+    nonft_factor_model = FactorsPeople(all_dirs)
     # model.train_dropout = False  # relighting humans
 
     if LOAD_PATH:
         model.load_state_dict(torch.load(LOAD_PATH))
 
     print("Model and auxillary components initialized")
+
+    nonft_recons_error = 0
+    ft_recons_error = 0
+    count = 0
+    recons_error_criterion = nn.MSELoss()
 
     print("Beginning Eval.")
     for i, data in tqdm(enumerate(test_loader), total=len(test_loader)):
@@ -101,7 +115,15 @@ if __name__ == "__main__":
 
         gt = (img.detach() * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
         reconstruction, factors = factorspeople.reconstruct(img, mask)
+        nonft_reconstruction, nonft_factors = nonft_factor_model.reconstruct(img, mask)
         out = (reconstruction * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
+        nonft_out = (
+            (nonft_reconstruction * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
+        )
+
+        nonft_recons_error += recons_error_criterion(nonft_out, gt).item()
+        ft_recons_error += recons_error_criterion(out, gt)
+        count += 1
 
         if SAVE_DIR:
             out_np = out.detach().cpu().numpy()
@@ -135,4 +157,14 @@ if __name__ == "__main__":
             )
             # imsave(name, rendering.detach().cpu().numpy())
 
-    print(f"Eval Finished - images are in {SAVE_DIR}")
+    if SAVE_DIR:
+        print(f"Eval Finished - images are in {SAVE_DIR}")
+    else:
+        print("Eval Finished")
+
+    print(
+        f"Average Validation Set Reconstruction Error, Fine Tuned: {ft_recons_error / count}"
+    )
+    print(
+        f"Average Validation Set Reconstruction Error, NON Fine Tuned: {nonft_recons_error / count}"
+    )
