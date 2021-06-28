@@ -88,6 +88,7 @@ if __name__ == "__main__":
     factorspeople.set_eval()
 
     nonft_factor_model = FactorsPeople(all_dirs)
+    nonft_factor_model.set_eval()
     # model.train_dropout = False  # relighting humans
 
     if LOAD_PATH:
