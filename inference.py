@@ -115,15 +115,23 @@ if __name__ == "__main__":
             continue
 
         gt = (img.detach() * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
-        reconstruction, factors = factorspeople.reconstruct(img, mask)
-        nonft_reconstruction, nonft_factors = nonft_factor_model.reconstruct(img, mask)
-        out = (reconstruction * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
-        nonft_out = (
-            (nonft_reconstruction * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
-        )
 
+        nonft_reconstruction, nonft_factors = nonft_factor_model.reconstruct(img, mask)
+        nonft_out = (
+            (nonft_reconstruction.detach() * mask.detach() * 255.0)
+            .squeeze()
+            .permute(1, 2, 0)
+        )
         nonft_recons_error += recons_error_criterion(nonft_out, gt).item()
-        ft_recons_error += recons_error_criterion(out, gt)
+
+        torch.cuda.empty_cache()
+
+        reconstruction, factors = factorspeople.reconstruct(img, mask)
+        out = (
+            (reconstruction.detach() * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
+        )
+        ft_recons_error += recons_error_criterion(out, gt).item()
+
         count += 1
 
         if SAVE_DIR:
