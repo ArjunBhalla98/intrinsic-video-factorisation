@@ -194,7 +194,6 @@ def ResizeImage(img_raw, mask_raw, scene=None):
     img_shape = img_raw.shape
     sx, sy = img_raw.shape[0] // 2, img_raw.shape[1] // 2
 
-    print(img_raw.shape, mask_raw.shape)
     mask = np.zeros((img_shape[0] * 2, img_shape[1] * 2), dtype=np.uint8)
     mask[sx : sx + img_shape[0], sy : sy + img_shape[1]] = mask_raw
 

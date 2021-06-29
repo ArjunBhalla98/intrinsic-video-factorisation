@@ -40,6 +40,8 @@ class TikTokDataset(Dataset):
         self.sample_size = sample_size
         self.squarize_size = squarize_size
         appended_path = root_dir
+        self.smaller_width = 278
+        self.smaller_height = 500
 
         video_dirs = os.listdir(appended_path)[:40]
         TRAIN_TEST_SPLIT = round(0.8 * len(video_dirs))
@@ -112,7 +114,9 @@ class TikTokDataset(Dataset):
                         Image.open(im), self.squarize_size
                     ).numpy()
                     if self.squarize_size
-                    else np.array(Image.open(im)),
+                    else np.array(
+                        Image.open(im).resize((self.smaller_width, self.smaller_height))
+                    ),
                     video_imgs[idx],
                 )
             )
@@ -124,7 +128,9 @@ class TikTokDataset(Dataset):
                         Image.open(im), self.squarize_size
                     ).numpy()
                     if self.squarize_size
-                    else np.array(Image.open(im)),
+                    else np.array(
+                        Image.open(im).resize(self.smaller_width, self.smaller_height)
+                    ),
                     video_masks[idx],
                 )
             )
