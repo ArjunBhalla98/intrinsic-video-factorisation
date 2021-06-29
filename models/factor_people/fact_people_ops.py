@@ -81,8 +81,8 @@ class FactorsPeople:
         )
 
     def get_image(self, img_path, mask_path):
-        input_img_origin = np.array(Image.open(img_path))
-        input_mask_origin = np.array(Image.open(mask_path))
+        input_img_origin = np.array(Image.open(img_path).resize((278, 500)))
+        input_mask_origin = np.array(Image.open(mask_path).resize((278, 500)))
         if input_mask_origin.shape[0:2] != input_img_origin.shape[0:2]:
             input_img_origin = input_img_origin.transpose(1, 0, 2)
             input_img_origin = input_img_origin[:, ::-1, :]
