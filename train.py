@@ -198,7 +198,7 @@ if __name__ == "__main__":
             )
 
             # for running relighting humans
-            gt = (images * mask3).to(device)
+            gt = (images * mask3).to(device).squeeze(0).permute(1, 2, 0)
             images = 2.0 * images - 1
             model_input = (images * mask3).to(device)
             # imageio.imsave("model_input.png", model_input.detach().squeeze(0))
