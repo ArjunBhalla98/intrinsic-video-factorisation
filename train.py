@@ -109,7 +109,6 @@ if __name__ == "__main__":
     # Handle all model related stuff
     model = training_model()
     model = model.to(device)
-    params = model.parameters()
 
     if LOAD_PATH:
         model.load_state_dict(torch.load(LOAD_PATH))
@@ -134,6 +133,7 @@ if __name__ == "__main__":
     #     + list(factorspeople.shadow_net.parameters())
     #     + list(factorspeople.refine_rendering_net.parameters())
     # )
+    params = model.parameters()
     optimizer = optim.Adam(params, lr=LR, betas=(0.9, 0.999))
 
     print("Model and auxillary components initialized")
@@ -220,7 +220,7 @@ if __name__ == "__main__":
             running_loss += loss.item()
             loss.backward()
             optimizer.step()
-            wandb.log({"loss": loss})
+            wandb.log({"loss": loss.item()})
 
         epoch_batch_loss = running_loss / len(train_loader)
         print(f"Loss: {epoch_batch_loss}")
