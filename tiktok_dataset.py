@@ -2,11 +2,13 @@ import os
 import glob
 import torch
 import random
+import imageio
 import numpy as np
 from PIL import Image
 from utils import squarize_image
 from collections import defaultdict
 from torch.utils.data.dataset import Dataset
+from torch.utils.data import DataLoader
 
 
 class TikTokDataset(Dataset):
@@ -16,7 +18,7 @@ class TikTokDataset(Dataset):
         device,
         train=True,
         transform=None,
-        sample_size=4,
+        sample_size=1,
         squarize_size=None,
     ):
         """
@@ -115,7 +117,10 @@ class TikTokDataset(Dataset):
                     ).numpy()
                     if self.squarize_size
                     else np.array(
-                        Image.open(im).resize((self.smaller_width, self.smaller_height))
+                        Image.open(im).resize(
+                            (self.smaller_width, self.smaller_height),
+                            resample=Image.BICUBIC,
+                        )
                     ),
                     video_imgs[idx],
                 )
@@ -129,7 +134,10 @@ class TikTokDataset(Dataset):
                     ).numpy()
                     if self.squarize_size
                     else np.array(
-                        Image.open(im).resize(self.smaller_width, self.smaller_height)
+                        Image.open(im).resize(
+                            (self.smaller_width, self.smaller_height),
+                            resample=Image.BICUBIC,
+                        )
                     ),
                     video_masks[idx],
                 )
@@ -154,3 +162,23 @@ class TikTokDataset(Dataset):
             "img_paths": video_imgs[idx],
             "mask_paths": video_masks[idx],
         }
+
+
+if __name__ == "__main__":
+    # Test script
+    root_dir = "/Users/arjunbhalla/Desktop/TikTok_dataset/"
+    device = torch.device("cpu")
+    dataset = TikTokDataset(root_dir, device)
+    dataloader = DataLoader(dataset)
+
+    for _, data in enumerate(dataloader):
+        masks = data["masks"].squeeze(0)
+        images = data["images"].squeeze(0)
+        image = images.squeeze(0).detach().numpy()
+        mask = masks.squeeze(0).unsqueeze(-1).detach().numpy() / 255.0
+
+        imageio.imsave("./dataloader_test_raw.png", image)
+        imageio.imsave("./dataloader_test_mask.png", mask)
+        imageio.imsave("./dataloader_test_combined.png", image * mask)
+        break
+
