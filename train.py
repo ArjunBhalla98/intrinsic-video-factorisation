@@ -152,12 +152,12 @@ if __name__ == "__main__":
 
             optimizer.zero_grad()
             #### PUT MODEL SPECIFIC FORWARD PASS CODE HERE ####
-            try:
-                img, mask = factorspeople.get_image(
-                    data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
-                )
-            except Exception:
-                continue
+            # try:
+            img, mask = factorspeople.get_image(
+                data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
+            )
+            # except Exception:
+            #     continue
 
             gt = img.detach() * mask.detach()
             out, factors = factorspeople.reconstruct(img, mask)
