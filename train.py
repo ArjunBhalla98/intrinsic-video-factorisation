@@ -9,7 +9,7 @@ from tqdm import tqdm
 import torch.optim as optim
 from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
-from data.tiktok_dataset import TikTokDataset
+from tiktok_dataset import TikTokDataset
 from models.factor_people.fact_people_ops import *
 
 # To change loss or model, adjust these:
