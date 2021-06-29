@@ -113,7 +113,10 @@ class TikTokDataset(Dataset):
             list(
                 map(
                     lambda im: squarize_image(
-                        Image.open(im), self.squarize_size
+                        Image.open(im).resize(
+                            (self.smaller_width, self.smaller_height)
+                        ),
+                        self.squarize_size,
                     ).numpy()
                     if self.squarize_size
                     else np.array(
@@ -130,7 +133,10 @@ class TikTokDataset(Dataset):
             list(
                 map(
                     lambda im: squarize_image(
-                        Image.open(im), self.squarize_size
+                        Image.open(im).resize(
+                            (self.smaller_width, self.smaller_height)
+                        ),
+                        self.squarize_size,
                     ).numpy()
                     if self.squarize_size
                     else np.array(
