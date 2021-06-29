@@ -202,9 +202,9 @@ if __name__ == "__main__":
             images = 2.0 * images - 1
             model_input = (images * mask3).to(device)
             # imageio.imsave("model_input.png", model_input.detach().squeeze(0))
-            rendering = model(gt)
-            rendering_save = rendering.detach() - torch.min(rendering.detach())
-            rendering_save = rendering_save / torch.max(rendering_save)
+            # rendering = model(gt)
+            # rendering_save = rendering.detach() - torch.min(rendering.detach())
+            # rendering_save = rendering_save / torch.max(rendering_save)
 
             transport, albedo, light = model(model_input)
             transport = Variable((mask9 * transport).data[0], requires_grad=True)
