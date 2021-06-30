@@ -7,27 +7,27 @@ MAX_VAL = 255.0
 from scipy.sparse import csr_matrix
 import numpy as np
 
-from scipy.sparse.linalg  import inv
+from scipy.sparse.linalg import inv
 
-RGB_TO_YUV = np.array([
-    [ 0.299,     0.587,     0.114],
-    [-0.168736, -0.331264,  0.5],
-    [ 0.5,      -0.418688, -0.081312]])
-YUV_TO_RGB = np.array([
-    [1.0,  0.0,      1.402],
-    [1.0, -0.34414, -0.71414],
-    [1.0,  1.772,    0.0]])
+RGB_TO_YUV = np.array(
+    [[0.299, 0.587, 0.114], [-0.168736, -0.331264, 0.5], [0.5, -0.418688, -0.081312]]
+)
+YUV_TO_RGB = np.array([[1.0, 0.0, 1.402], [1.0, -0.34414, -0.71414], [1.0, 1.772, 0.0]])
 YUV_OFFSET = np.array([0, 128.0, 128.0]).reshape(1, 1, -1)
+
 
 def rgb2yuv(im):
     return np.tensordot(im, RGB_TO_YUV, ([2], [1])) + YUV_OFFSET
 
+
 def yuv2rgb(im):
     return np.tensordot(im.astype(float) - YUV_OFFSET, YUV_TO_RGB, ([2], [1]))
+
 
 ##############################################################################
 REQUIRES_CONF_GRAD = True
 ##############################################################################
+
 
 def get_valid_idx(valid, candidates):
     """Find which values are present in a list and where they are located"""
@@ -39,29 +39,33 @@ def get_valid_idx(valid, candidates):
     locs = locs[valid_idx]
     return valid_idx, locs
 
+
 class BilateralGrid(object):
     def __init__(self, im, sigma_spatial=32, sigma_luma=8, sigma_chroma=8):
+        ## added by arjun
+        im = im.detach()
         im_yuv = rgb2yuv(im)
         # Compute 5-dimensional XYLUV bilateral-space coordinates
-        Iy, Ix = np.mgrid[:im.shape[0], :im.shape[1]]
+        Iy, Ix = np.mgrid[: im.shape[0], : im.shape[1]]
         x_coords = (Ix / sigma_spatial).astype(int)
         y_coords = (Iy / sigma_spatial).astype(int)
-        luma_coords = (im_yuv[..., 0] /sigma_luma).astype(int)
+        luma_coords = (im_yuv[..., 0] / sigma_luma).astype(int)
         chroma_coords = (im_yuv[..., 1:] / sigma_chroma).astype(int)
         coords = np.dstack((x_coords, y_coords, luma_coords, chroma_coords))
         coords_flat = coords.reshape(-1, coords.shape[-1])
         self.npixels, self.dim = coords_flat.shape
         # Hacky "hash vector" for coordinates,
         # Requires all scaled coordinates be < MAX_VAL
-        self.hash_vec = (MAX_VAL**np.arange(self.dim))
+        self.hash_vec = MAX_VAL ** np.arange(self.dim)
         # Construct S and B matrix
         self._compute_factorization(coords_flat)
 
     def _compute_factorization(self, coords_flat):
         # Hash each coordinate in grid to a unique value
         hashed_coords = self._hash_coords(coords_flat)
-        unique_hashes, unique_idx, idx = \
-            np.unique(hashed_coords, return_index=True, return_inverse=True)
+        unique_hashes, unique_idx, idx = np.unique(
+            hashed_coords, return_index=True, return_inverse=True
+        )
         # Identify unique set of vertices
         unique_coords = coords_flat[unique_idx]
         self.nvertices = len(unique_coords)
@@ -77,9 +81,10 @@ class BilateralGrid(object):
                 offset_vec[:, d] = offset
                 neighbor_hash = self._hash_coords(unique_coords + offset_vec)
                 valid_coord, idx = get_valid_idx(unique_hashes, neighbor_hash)
-                blur = blur + csr_matrix((np.ones((len(valid_coord),)),
-                                          (valid_coord, idx)),
-                                         shape=(self.nvertices, self.nvertices))
+                blur = blur + csr_matrix(
+                    (np.ones((len(valid_coord),)), (valid_coord, idx)),
+                    shape=(self.nvertices, self.nvertices),
+                )
             self.blurs.append(blur)
 
     def _hash_coords(self, coord):
@@ -102,8 +107,10 @@ class BilateralGrid(object):
 
     def filter(self, x):
         """Apply bilateral filter to an input x"""
-        return self.slice(self.blur(self.splat(x))) /  \
-               self.slice(self.blur(self.splat(np.ones_like(x))))
+        return self.slice(self.blur(self.splat(x))) / self.slice(
+            self.blur(self.splat(np.ones_like(x)))
+        )
+
 
 def bistochastize(grid, maxiter=10):
     """Compute diagonal matrices to bistochastize a bilateral grid"""
@@ -118,6 +125,7 @@ def bistochastize(grid, maxiter=10):
     Dn = diags(n, 0)
     return Dn, Dm
 
+
 class BilateralSolver(object):
     def __init__(self, grid, params):
         self.grid = grid
@@ -127,12 +135,12 @@ class BilateralSolver(object):
     def solve(self, x, w):
         # Check that w is a vector or a nx1 matrix
         if w.ndim == 2:
-            assert(w.shape[1] == 1)
+            assert w.shape[1] == 1
         elif w.dim == 1:
             w = w.reshape(w.shape[0], 1)
-        A_smooth = (self.Dm - self.Dn.dot(self.grid.blur(self.Dn)))
+        A_smooth = self.Dm - self.Dn.dot(self.grid.blur(self.Dn))
         w_splat = self.grid.splat(w)
-        A_data = diags(w_splat[:,0], 0)
+        A_data = diags(w_splat[:, 0], 0)
         A = self.params["lam"] * A_smooth + A_data
         xw = x * w
         b = self.grid.splat(xw)
@@ -143,7 +151,14 @@ class BilateralSolver(object):
         y0 = self.grid.splat(xw) / np.maximum(w_splat, 1e-10)
         yhat = np.empty_like(y0)
         for d in range(x.shape[-1]):
-            yhat[..., d], info = cg(A, b[..., d], x0=y0[..., d], M=M, maxiter=self.params["cg_maxiter"], tol=self.params["cg_tol"])
+            yhat[..., d], info = cg(
+                A,
+                b[..., d],
+                x0=y0[..., d],
+                M=M,
+                maxiter=self.params["cg_maxiter"],
+                tol=self.params["cg_tol"],
+            )
         xhat = self.grid.slice(yhat)
 
         return xhat, yhat
@@ -151,12 +166,12 @@ class BilateralSolver(object):
     def solveGrad(self, x, w, saved_yhat, saved_target):
         # Check that w is a vector or a nx1 matrix
         if w.ndim == 2:
-            assert(w.shape[1] == 1)
+            assert w.shape[1] == 1
         elif w.dim == 1:
             w = w.reshape(w.shape[0], 1)
-        A_smooth = (self.Dm - self.Dn.dot(self.grid.blur(self.Dn)))
+        A_smooth = self.Dm - self.Dn.dot(self.grid.blur(self.Dn))
         w_splat = self.grid.splat(w)
-        A_data = diags(w_splat[:,0], 0)
+        A_data = diags(w_splat[:, 0], 0)
         A = self.params["lam"] * A_smooth + A_data
         b = self.grid.splat(x)
         # Use simple Jacobi preconditioner
@@ -168,7 +183,14 @@ class BilateralSolver(object):
         y0 = self.grid.splat(x * w_1) / self.grid.splat(w_1)
         yhat = np.empty_like(y0)
         for d in range(x.shape[-1]):
-            yhat[..., d], info = cg(A, b[..., d], x0=y0[..., d], M=M, maxiter=self.params["cg_maxiter"], tol=self.params["cg_tol"])
+            yhat[..., d], info = cg(
+                A,
+                b[..., d],
+                x0=y0[..., d],
+                M=M,
+                maxiter=self.params["cg_maxiter"],
+                tol=self.params["cg_tol"],
+            )
         grad_f_b = yhat
 
         slice_grad_f_b = self.grid.slice(grad_f_b)
@@ -182,20 +204,20 @@ class BilateralSolver(object):
             grad_conf = None
         return grad_t, grad_conf
 
+
 def solve(grid, target, confidence, bs_params, im_shape):
-    t = target.reshape(-1, im_shape[2] ).astype(np.double)
-    c = confidence.reshape(-1, 1).astype(np.double) # / (pow(2,16)-1)
+    t = target.reshape(-1, im_shape[2]).astype(np.double)
+    c = confidence.reshape(-1, 1).astype(np.double)  # / (pow(2,16)-1)
     xhat, yhat = BilateralSolver(grid, bs_params).solve(t, c)
     xhat = xhat.reshape(im_shape)
     return xhat, yhat
 
-def solveForGrad(grid, grad_f_x, confidence, bs_params, im_shape, yhat,
-        target):
-    grad = grad_f_x.reshape(-1, im_shape[2] ).astype(np.double)
+
+def solveForGrad(grid, grad_f_x, confidence, bs_params, im_shape, yhat, target):
+    grad = grad_f_x.reshape(-1, im_shape[2]).astype(np.double)
     c = confidence.reshape(-1, 1).astype(np.double)
-    t = target.reshape(-1, im_shape[2] ).astype(np.double)
-    grad_t, grad_c = BilateralSolver(grid, bs_params).solveGrad(grad, c,
-            yhat, t)
+    t = target.reshape(-1, im_shape[2]).astype(np.double)
+    grad_t, grad_c = BilateralSolver(grid, bs_params).solveGrad(grad, c, yhat, t)
     grad_t = grad_t.reshape(im_shape)
 
     if REQUIRES_CONF_GRAD == True:
@@ -204,6 +226,4 @@ def solveForGrad(grid, grad_f_x, confidence, bs_params, im_shape, yhat,
     else:
         grad_c = None
     return grad_t, grad_c
-
-
 

@@ -2,11 +2,13 @@ import os
 import glob
 import torch
 import random
+import imageio
 import numpy as np
 from PIL import Image
 from utils import squarize_image
 from collections import defaultdict
 from torch.utils.data.dataset import Dataset
+from torch.utils.data import DataLoader
 
 
 class TikTokDataset(Dataset):
@@ -16,11 +18,11 @@ class TikTokDataset(Dataset):
         device,
         train=True,
         transform=None,
-        sample_size=4,
+        sample_size=1,
         squarize_size=None,
     ):
         """
-        Initialises the TikTok Dataset. This will return, upon "getitem", a sample that is 
+        Initialises the TikTok Dataset. This will return, upon "getitem", a sample that is
         temporally contiguous from a random video, of length sample_size. This function is built to
         "lazy load" so as not to clog up memory.
 
@@ -33,15 +35,30 @@ class TikTokDataset(Dataset):
         self.images = []
         self.masks = []
         self.names = []
+        self.image_paths = []
+        self.mask_paths = []
         self.transform = transform
         self.train = train
         self.sample_size = sample_size
         self.squarize_size = squarize_size
         appended_path = root_dir
+        self.smaller_width = 278
+        self.smaller_height = 500
 
-        for folder in os.listdir(appended_path)[:40]:
+        video_dirs = os.listdir(appended_path)[:40]
+        TRAIN_TEST_SPLIT = round(0.8 * len(video_dirs))
+
+        for i, folder in enumerate(video_dirs):
             if not os.path.isdir(appended_path + folder):
                 continue
+
+            if i == TRAIN_TEST_SPLIT:
+                self.train_images = self.images[:]
+                self.train_masks = self.masks[:]
+                self.train_names = self.names[:]
+
+                self.images = []
+                self.masks = []
 
             video_imgs = glob.glob(f"{appended_path}/{folder}/images/*.png")
             video_masks = glob.glob(f"{appended_path}/{folder}/masks/*.png")
@@ -69,19 +86,11 @@ class TikTokDataset(Dataset):
 
             assert len(self.images) == len(self.masks), "Images Length != Masks Length"
 
-        TRAIN_TEST_SPLIT = round(0.8 * len(self.images))
-        self.train_images = self.images[:TRAIN_TEST_SPLIT]
-        self.train_masks = self.masks[:TRAIN_TEST_SPLIT]
-        self.train_names = self.names[:TRAIN_TEST_SPLIT]
-
-        self.test_images = self.images[TRAIN_TEST_SPLIT:]
-        self.test_masks = self.masks[TRAIN_TEST_SPLIT:]
-        self.test_names = self.names[TRAIN_TEST_SPLIT:]
+        self.test_images = self.images[:]
+        self.test_masks = self.masks[:]
+        self.test_names = self.names[:]
 
     def __len__(self):
-        # print(self.train_names[:4])
-        return 1
-
         if self.train:
             return len(self.train_images)
         else:
@@ -104,10 +113,18 @@ class TikTokDataset(Dataset):
             list(
                 map(
                     lambda im: squarize_image(
-                        Image.open(im), self.squarize_size
+                        Image.open(im).resize(
+                            (self.smaller_width, self.smaller_height)
+                        ),
+                        self.squarize_size,
                     ).numpy()
                     if self.squarize_size
-                    else np.array(Image.open(im)),
+                    else np.array(
+                        Image.open(im).resize(
+                            (self.smaller_width, self.smaller_height),
+                            resample=Image.BICUBIC,
+                        )
+                    ),
                     video_imgs[idx],
                 )
             )
@@ -116,10 +133,18 @@ class TikTokDataset(Dataset):
             list(
                 map(
                     lambda im: squarize_image(
-                        Image.open(im), self.squarize_size
+                        Image.open(im).resize(
+                            (self.smaller_width, self.smaller_height)
+                        ),
+                        self.squarize_size,
                     ).numpy()
                     if self.squarize_size
-                    else np.array(Image.open(im)),
+                    else np.array(
+                        Image.open(im).resize(
+                            (self.smaller_width, self.smaller_height),
+                            resample=Image.BICUBIC,
+                        )
+                    ),
                     video_masks[idx],
                 )
             )
@@ -136,4 +161,30 @@ class TikTokDataset(Dataset):
                 dim=0,
             )
 
-        return {"images": images, "masks": masks, "names": video_names[idx]}
+        return {
+            "images": images,
+            "masks": masks,
+            "names": video_names[idx],
+            "img_paths": video_imgs[idx],
+            "mask_paths": video_masks[idx],
+        }
+
+
+if __name__ == "__main__":
+    # Test script
+    root_dir = "/Users/arjunbhalla/Desktop/TikTok_dataset/"
+    device = torch.device("cpu")
+    dataset = TikTokDataset(root_dir, device)
+    dataloader = DataLoader(dataset)
+
+    for _, data in enumerate(dataloader):
+        masks = data["masks"].squeeze(0)
+        images = data["images"].squeeze(0)
+        image = images.squeeze(0).detach().numpy()
+        mask = masks.squeeze(0).unsqueeze(-1).detach().numpy() / 255.0
+
+        imageio.imsave("./dataloader_test_raw.png", image)
+        imageio.imsave("./dataloader_test_mask.png", mask)
+        imageio.imsave("./dataloader_test_combined.png", image * mask)
+        break
+

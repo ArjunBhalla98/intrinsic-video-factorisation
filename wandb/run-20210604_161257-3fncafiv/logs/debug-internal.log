@@ -1,0 +1,118 @@
+2021-06-04 16:12:58,458 INFO    MainThread:11239 [internal.py:wandb_internal():88] W&B internal server running at pid: 11239, started at: 2021-06-04 16:12:58.458169
+2021-06-04 16:12:58,460 INFO    WriterThread:11239 [datastore.py:open_for_write():77] open: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/run-3fncafiv.wandb
+2021-06-04 16:12:58,460 DEBUG   HandlerThread:11239 [handler.py:handle_request():121] handle_request: check_version
+2021-06-04 16:12:58,461 DEBUG   SenderThread:11239 [sender.py:send():176] send: header
+2021-06-04 16:12:58,461 DEBUG   SenderThread:11239 [sender.py:send_request():186] send_request: check_version
+2021-06-04 16:12:58,503 DEBUG   SenderThread:11239 [sender.py:send():176] send: run
+2021-06-04 16:12:58,633 INFO    SenderThread:11239 [dir_watcher.py:__init__():168] watching files in: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files
+2021-06-04 16:12:58,633 INFO    SenderThread:11239 [sender.py:_start_run_threads():696] run started: 3fncafiv with start time 1622837577
+2021-06-04 16:12:58,633 DEBUG   SenderThread:11239 [sender.py:send():176] send: summary
+2021-06-04 16:12:58,634 INFO    SenderThread:11239 [sender.py:_save_file():821] saving file wandb-summary.json with policy end
+2021-06-04 16:12:58,634 DEBUG   HandlerThread:11239 [handler.py:handle_request():121] handle_request: run_start
+2021-06-04 16:12:58,636 DEBUG   HandlerThread:11239 [meta.py:__init__():39] meta init
+2021-06-04 16:12:58,636 DEBUG   HandlerThread:11239 [meta.py:__init__():53] meta init done
+2021-06-04 16:12:58,636 DEBUG   HandlerThread:11239 [meta.py:probe():210] probe
+2021-06-04 16:12:58,638 DEBUG   HandlerThread:11239 [meta.py:_setup_git():200] setup git
+2021-06-04 16:12:58,674 DEBUG   HandlerThread:11239 [meta.py:_setup_git():207] setup git done
+2021-06-04 16:12:58,675 DEBUG   HandlerThread:11239 [meta.py:_save_pip():57] save pip
+2021-06-04 16:12:58,675 DEBUG   HandlerThread:11239 [meta.py:_save_pip():71] save pip done
+2021-06-04 16:12:58,676 DEBUG   HandlerThread:11239 [meta.py:_save_conda():78] save conda
+2021-06-04 16:12:59,639 INFO    Thread-8  :11239 [dir_watcher.py:_on_file_created():216] file/dir created: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/wandb-summary.json
+2021-06-04 16:12:59,639 INFO    Thread-8  :11239 [dir_watcher.py:_on_file_created():216] file/dir created: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/conda-environment.yaml
+2021-06-04 16:12:59,639 INFO    Thread-8  :11239 [dir_watcher.py:_on_file_created():216] file/dir created: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/requirements.txt
+2021-06-04 16:13:00,763 DEBUG   HandlerThread:11239 [meta.py:_save_conda():86] save conda done
+2021-06-04 16:13:00,763 DEBUG   HandlerThread:11239 [meta.py:probe():252] probe done
+2021-06-04 16:13:00,766 DEBUG   SenderThread:11239 [sender.py:send():176] send: files
+2021-06-04 16:13:00,766 INFO    SenderThread:11239 [sender.py:_save_file():821] saving file wandb-metadata.json with policy now
+2021-06-04 16:13:00,771 DEBUG   HandlerThread:11239 [handler.py:handle_request():121] handle_request: stop_status
+2021-06-04 16:13:00,771 DEBUG   SenderThread:11239 [sender.py:send_request():186] send_request: stop_status
+2021-06-04 16:13:01,191 INFO    Thread-11 :11239 [upload_job.py:push():133] Uploaded file /var/folders/3c/rpr5lfz156j_zsqclzc1tz980000gn/T/tmpn3qcxgofwandb/s2ec19th-wandb-metadata.json
+2021-06-04 16:13:01,638 INFO    Thread-8  :11239 [dir_watcher.py:_on_file_modified():229] file/dir modified: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/conda-environment.yaml
+2021-06-04 16:13:01,638 INFO    Thread-8  :11239 [dir_watcher.py:_on_file_created():216] file/dir created: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/output.log
+2021-06-04 16:13:01,639 INFO    Thread-8  :11239 [dir_watcher.py:_on_file_created():216] file/dir created: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/wandb-metadata.json
+2021-06-04 16:13:02,939 DEBUG   SenderThread:11239 [sender.py:send():176] send: telemetry
+2021-06-04 16:13:02,942 DEBUG   HandlerThread:11239 [handler.py:handle_request():121] handle_request: poll_exit
+2021-06-04 16:13:03,028 DEBUG   SenderThread:11239 [sender.py:send():176] send: exit
+2021-06-04 16:13:03,028 INFO    SenderThread:11239 [sender.py:send_exit():281] handling exit code: 1
+2021-06-04 16:13:03,028 INFO    SenderThread:11239 [sender.py:send_exit():289] send defer
+2021-06-04 16:13:03,028 DEBUG   SenderThread:11239 [sender.py:send_request():186] send_request: poll_exit
+2021-06-04 16:13:03,029 DEBUG   HandlerThread:11239 [handler.py:handle_request():121] handle_request: defer
+2021-06-04 16:13:03,029 INFO    HandlerThread:11239 [handler.py:handle_request_defer():138] handle defer: 0
+2021-06-04 16:13:03,029 DEBUG   SenderThread:11239 [sender.py:send_request():186] send_request: defer
+2021-06-04 16:13:03,030 INFO    SenderThread:11239 [sender.py:send_request_defer():298] handle sender defer: 0
+2021-06-04 16:13:03,030 INFO    SenderThread:11239 [sender.py:send_request_defer():336] send defer: 1
+2021-06-04 16:13:03,030 DEBUG   HandlerThread:11239 [handler.py:handle_request():121] handle_request: defer
+2021-06-04 16:13:03,030 INFO    HandlerThread:11239 [handler.py:handle_request_defer():138] handle defer: 1
+2021-06-04 16:13:03,032 DEBUG   SenderThread:11239 [sender.py:send_request():186] send_request: defer
+2021-06-04 16:13:03,032 WARNING MainThread:11239 [internal.py:wandb_internal():147] Internal process interrupt: 1
+2021-06-04 16:13:03,032 INFO    SenderThread:11239 [sender.py:send_request_defer():298] handle sender defer: 1
+2021-06-04 16:13:03,033 INFO    SenderThread:11239 [sender.py:send_request_defer():336] send defer: 2
+2021-06-04 16:13:03,033 DEBUG   SenderThread:11239 [sender.py:send():176] send: stats
+2021-06-04 16:13:03,033 DEBUG   HandlerThread:11239 [handler.py:handle_request():121] handle_request: defer
+2021-06-04 16:13:03,034 INFO    HandlerThread:11239 [handler.py:handle_request_defer():138] handle defer: 2
+2021-06-04 16:13:03,034 DEBUG   SenderThread:11239 [sender.py:send_request():186] send_request: defer
+2021-06-04 16:13:03,034 INFO    SenderThread:11239 [sender.py:send_request_defer():298] handle sender defer: 2
+2021-06-04 16:13:03,034 INFO    SenderThread:11239 [sender.py:send_request_defer():336] send defer: 3
+2021-06-04 16:13:03,034 DEBUG   HandlerThread:11239 [handler.py:handle_request():121] handle_request: defer
+2021-06-04 16:13:03,034 INFO    HandlerThread:11239 [handler.py:handle_request_defer():138] handle defer: 3
+2021-06-04 16:13:03,034 DEBUG   SenderThread:11239 [sender.py:send():176] send: summary
+2021-06-04 16:13:03,035 INFO    SenderThread:11239 [sender.py:_save_file():821] saving file wandb-summary.json with policy end
+2021-06-04 16:13:03,035 DEBUG   SenderThread:11239 [sender.py:send_request():186] send_request: defer
+2021-06-04 16:13:03,035 INFO    SenderThread:11239 [sender.py:send_request_defer():298] handle sender defer: 3
+2021-06-04 16:13:03,035 INFO    SenderThread:11239 [sender.py:send_request_defer():336] send defer: 4
+2021-06-04 16:13:03,035 DEBUG   HandlerThread:11239 [handler.py:handle_request():121] handle_request: defer
+2021-06-04 16:13:03,035 INFO    HandlerThread:11239 [handler.py:handle_request_defer():138] handle defer: 4
+2021-06-04 16:13:03,036 DEBUG   SenderThread:11239 [sender.py:send_request():186] send_request: defer
+2021-06-04 16:13:03,036 INFO    SenderThread:11239 [sender.py:send_request_defer():298] handle sender defer: 4
+2021-06-04 16:13:03,036 INFO    SenderThread:11239 [sender.py:send_request_defer():336] send defer: 5
+2021-06-04 16:13:03,036 DEBUG   HandlerThread:11239 [handler.py:handle_request():121] handle_request: defer
+2021-06-04 16:13:03,036 INFO    HandlerThread:11239 [handler.py:handle_request_defer():138] handle defer: 5
+2021-06-04 16:13:03,036 DEBUG   SenderThread:11239 [sender.py:send_request():186] send_request: defer
+2021-06-04 16:13:03,036 INFO    SenderThread:11239 [sender.py:send_request_defer():298] handle sender defer: 5
+2021-06-04 16:13:03,036 INFO    SenderThread:11239 [dir_watcher.py:finish():282] shutting down directory watcher
+2021-06-04 16:13:03,648 INFO    SenderThread:11239 [dir_watcher.py:_on_file_modified():229] file/dir modified: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/output.log
+2021-06-04 16:13:03,648 INFO    SenderThread:11239 [dir_watcher.py:_on_file_modified():229] file/dir modified: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/wandb-summary.json
+2021-06-04 16:13:03,649 INFO    SenderThread:11239 [dir_watcher.py:_on_file_modified():229] file/dir modified: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/config.yaml
+2021-06-04 16:13:03,649 INFO    SenderThread:11239 [dir_watcher.py:finish():312] scan: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files
+2021-06-04 16:13:03,649 INFO    SenderThread:11239 [dir_watcher.py:finish():318] scan save: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/requirements.txt requirements.txt
+2021-06-04 16:13:03,650 INFO    SenderThread:11239 [dir_watcher.py:finish():318] scan save: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/output.log output.log
+2021-06-04 16:13:03,654 INFO    SenderThread:11239 [dir_watcher.py:finish():318] scan save: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/config.yaml config.yaml
+2021-06-04 16:13:03,657 INFO    SenderThread:11239 [dir_watcher.py:finish():318] scan save: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/wandb-summary.json wandb-summary.json
+2021-06-04 16:13:03,663 INFO    SenderThread:11239 [dir_watcher.py:finish():318] scan save: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/conda-environment.yaml conda-environment.yaml
+2021-06-04 16:13:03,664 INFO    SenderThread:11239 [dir_watcher.py:finish():318] scan save: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/wandb-metadata.json wandb-metadata.json
+2021-06-04 16:13:03,665 INFO    SenderThread:11239 [sender.py:send_request_defer():336] send defer: 6
+2021-06-04 16:13:03,672 DEBUG   HandlerThread:11239 [handler.py:handle_request():121] handle_request: defer
+2021-06-04 16:13:03,676 INFO    HandlerThread:11239 [handler.py:handle_request_defer():138] handle defer: 6
+2021-06-04 16:13:03,676 DEBUG   SenderThread:11239 [sender.py:send_request():186] send_request: defer
+2021-06-04 16:13:03,677 INFO    SenderThread:11239 [sender.py:send_request_defer():298] handle sender defer: 6
+2021-06-04 16:13:03,678 INFO    SenderThread:11239 [file_pusher.py:finish():176] shutting down file pusher
+2021-06-04 16:13:03,679 INFO    SenderThread:11239 [sender.py:send_request_defer():336] send defer: 7
+2021-06-04 16:13:03,680 DEBUG   HandlerThread:11239 [handler.py:handle_request():121] handle_request: defer
+2021-06-04 16:13:03,681 INFO    HandlerThread:11239 [handler.py:handle_request_defer():138] handle defer: 7
+2021-06-04 16:13:03,682 DEBUG   SenderThread:11239 [sender.py:send_request():186] send_request: defer
+2021-06-04 16:13:03,682 INFO    SenderThread:11239 [sender.py:send_request_defer():298] handle sender defer: 7
+2021-06-04 16:13:03,827 INFO    SenderThread:11239 [sender.py:send_request_defer():336] send defer: 8
+2021-06-04 16:13:03,827 DEBUG   HandlerThread:11239 [handler.py:handle_request():121] handle_request: defer
+2021-06-04 16:13:03,827 INFO    HandlerThread:11239 [handler.py:handle_request_defer():138] handle defer: 8
+2021-06-04 16:13:03,828 DEBUG   SenderThread:11239 [sender.py:send_request():186] send_request: defer
+2021-06-04 16:13:03,828 INFO    SenderThread:11239 [sender.py:send_request_defer():298] handle sender defer: 8
+2021-06-04 16:13:03,828 INFO    SenderThread:11239 [sender.py:send_request_defer():336] send defer: 9
+2021-06-04 16:13:03,828 DEBUG   SenderThread:11239 [sender.py:send():176] send: final
+2021-06-04 16:13:03,828 DEBUG   SenderThread:11239 [sender.py:send():176] send: footer
+2021-06-04 16:13:03,828 DEBUG   HandlerThread:11239 [handler.py:handle_request():121] handle_request: defer
+2021-06-04 16:13:03,828 INFO    HandlerThread:11239 [handler.py:handle_request_defer():138] handle defer: 9
+2021-06-04 16:13:03,829 DEBUG   SenderThread:11239 [sender.py:send_request():186] send_request: defer
+2021-06-04 16:13:03,829 INFO    SenderThread:11239 [sender.py:send_request_defer():298] handle sender defer: 9
+2021-06-04 16:13:04,013 INFO    Thread-15 :11239 [upload_job.py:push():133] Uploaded file /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/wandb-summary.json
+2021-06-04 16:13:04,019 INFO    Thread-13 :11239 [upload_job.py:push():133] Uploaded file /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/output.log
+2021-06-04 16:13:04,036 INFO    Thread-16 :11239 [upload_job.py:push():133] Uploaded file /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/conda-environment.yaml
+2021-06-04 16:13:04,055 INFO    Thread-12 :11239 [upload_job.py:push():133] Uploaded file /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/requirements.txt
+2021-06-04 16:13:04,059 INFO    Thread-14 :11239 [upload_job.py:push():133] Uploaded file /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/files/config.yaml
+2021-06-04 16:13:08,043 WARNING MainThread:11239 [internal.py:is_dead():366] Internal process exiting, parent pid 11228 disappeared
+2021-06-04 16:13:08,043 ERROR   MainThread:11239 [internal.py:wandb_internal():143] Internal process shutdown.
+2021-06-04 16:13:08,837 INFO    WriterThread:11239 [datastore.py:close():258] close: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_161257-3fncafiv/run-3fncafiv.wandb
+2021-06-04 16:13:08,837 INFO    SenderThread:11239 [sender.py:finish():925] shutting down sender
+2021-06-04 16:13:08,837 INFO    SenderThread:11239 [file_pusher.py:finish():176] shutting down file pusher
+2021-06-04 16:13:08,837 INFO    SenderThread:11239 [file_pusher.py:join():181] waiting for file pusher
+2021-06-04 16:13:08,837 INFO    HandlerThread:11239 [handler.py:finish():632] shutting down handler
+2021-06-04 16:13:08,838 INFO    MainThread:11239 [internal.py:handle_exit():78] Internal process exited

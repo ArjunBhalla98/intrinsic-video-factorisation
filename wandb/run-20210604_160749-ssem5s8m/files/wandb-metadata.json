@@ -1,0 +1,31 @@
+{
+    "os": "macOS-10.16-x86_64-i386-64bit",
+    "python": "3.8.5",
+    "heartbeatAt": "2021-06-04T20:07:50.427523",
+    "startedAt": "2021-06-04T20:07:49.369220",
+    "docker": null,
+    "cpu_count": 12,
+    "cuda": null,
+    "args": [
+        "--root_dir",
+        "/Users/arjunbhalla/Desktop/TikTok_dataset/",
+        "--batch",
+        "1",
+        "--epochs",
+        "10",
+        "--save_state",
+        "models/states/unet_recons.pth"
+    ],
+    "state": "running",
+    "program": "train.py",
+    "codePath": "train.py",
+    "git": {
+        "remote": "git@github.com:ArjunBhalla98/intrinsic-video-factorisation.git",
+        "commit": "50ba770bfaab1bb7be9b094c2b7f88c2316a3403"
+    },
+    "email": "arjunbhallasg@gmail.com",
+    "root": "/Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation",
+    "host": "Arjuns-MacBook-Pro.local",
+    "username": "arjunbhalla",
+    "executable": "/Users/arjunbhalla/opt/anaconda3/envs/video-factorisation/bin/python3"
+}

@@ -1,0 +1,35 @@
+2021-06-04 15:41:59,657 INFO    MainThread:9803 [internal.py:wandb_internal():88] W&B internal server running at pid: 9803, started at: 2021-06-04 15:41:59.656968
+2021-06-04 15:41:59,658 INFO    WriterThread:9803 [datastore.py:open_for_write():77] open: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_154159-2396v4u3/run-2396v4u3.wandb
+2021-06-04 15:41:59,658 DEBUG   HandlerThread:9803 [handler.py:handle_request():121] handle_request: check_version
+2021-06-04 15:41:59,659 DEBUG   SenderThread:9803 [sender.py:send():176] send: header
+2021-06-04 15:41:59,659 DEBUG   SenderThread:9803 [sender.py:send_request():186] send_request: check_version
+2021-06-04 15:41:59,706 DEBUG   SenderThread:9803 [sender.py:send():176] send: run
+2021-06-04 15:41:59,845 INFO    SenderThread:9803 [dir_watcher.py:__init__():168] watching files in: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_154159-2396v4u3/files
+2021-06-04 15:41:59,846 INFO    SenderThread:9803 [sender.py:_start_run_threads():696] run started: 2396v4u3 with start time 1622835719
+2021-06-04 15:41:59,846 DEBUG   SenderThread:9803 [sender.py:send():176] send: summary
+2021-06-04 15:41:59,846 INFO    SenderThread:9803 [sender.py:_save_file():821] saving file wandb-summary.json with policy end
+2021-06-04 15:41:59,846 DEBUG   HandlerThread:9803 [handler.py:handle_request():121] handle_request: run_start
+2021-06-04 15:41:59,849 DEBUG   HandlerThread:9803 [meta.py:__init__():39] meta init
+2021-06-04 15:41:59,849 DEBUG   HandlerThread:9803 [meta.py:__init__():53] meta init done
+2021-06-04 15:41:59,849 DEBUG   HandlerThread:9803 [meta.py:probe():210] probe
+2021-06-04 15:41:59,850 DEBUG   HandlerThread:9803 [meta.py:_setup_git():200] setup git
+2021-06-04 15:41:59,888 DEBUG   HandlerThread:9803 [meta.py:_setup_git():207] setup git done
+2021-06-04 15:41:59,889 DEBUG   HandlerThread:9803 [meta.py:_save_pip():57] save pip
+2021-06-04 15:41:59,889 DEBUG   HandlerThread:9803 [meta.py:_save_pip():71] save pip done
+2021-06-04 15:41:59,889 DEBUG   HandlerThread:9803 [meta.py:_save_conda():78] save conda
+2021-06-04 15:42:00,849 INFO    Thread-8  :9803 [dir_watcher.py:_on_file_created():216] file/dir created: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_154159-2396v4u3/files/requirements.txt
+2021-06-04 15:42:00,849 INFO    Thread-8  :9803 [dir_watcher.py:_on_file_created():216] file/dir created: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_154159-2396v4u3/files/wandb-summary.json
+2021-06-04 15:42:00,849 INFO    Thread-8  :9803 [dir_watcher.py:_on_file_created():216] file/dir created: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_154159-2396v4u3/files/conda-environment.yaml
+2021-06-04 15:42:02,318 DEBUG   HandlerThread:9803 [meta.py:_save_conda():86] save conda done
+2021-06-04 15:42:02,318 DEBUG   HandlerThread:9803 [meta.py:probe():252] probe done
+2021-06-04 15:42:02,322 DEBUG   SenderThread:9803 [sender.py:send():176] send: files
+2021-06-04 15:42:02,322 INFO    SenderThread:9803 [sender.py:_save_file():821] saving file wandb-metadata.json with policy now
+2021-06-04 15:42:02,325 DEBUG   HandlerThread:9803 [handler.py:handle_request():121] handle_request: stop_status
+2021-06-04 15:42:02,325 DEBUG   SenderThread:9803 [sender.py:send_request():186] send_request: stop_status
+2021-06-04 15:42:02,647 INFO    Thread-11 :9803 [upload_job.py:push():133] Uploaded file /var/folders/3c/rpr5lfz156j_zsqclzc1tz980000gn/T/tmpvnp_l85gwandb/1yr8j5re-wandb-metadata.json
+2021-06-04 15:42:02,849 INFO    Thread-8  :9803 [dir_watcher.py:_on_file_modified():229] file/dir modified: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_154159-2396v4u3/files/conda-environment.yaml
+2021-06-04 15:42:02,849 INFO    Thread-8  :9803 [dir_watcher.py:_on_file_created():216] file/dir created: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_154159-2396v4u3/files/output.log
+2021-06-04 15:42:02,849 INFO    Thread-8  :9803 [dir_watcher.py:_on_file_created():216] file/dir created: /Users/arjunbhalla/Desktop/School/Grad/Research/intrinsic-video-factorisation/wandb/run-20210604_154159-2396v4u3/files/wandb-metadata.json
+2021-06-04 15:42:16,481 WARNING MainThread:9803 [internal.py:wandb_internal():147] Internal process interrupt: 1
+2021-06-04 15:42:17,392 DEBUG   HandlerThread:9803 [handler.py:handle_request():121] handle_request: stop_status
+2021-06-04 15:42:17,392 DEBUG   SenderThread:9803 [sender.py:send_request():186] send_request: stop_status
