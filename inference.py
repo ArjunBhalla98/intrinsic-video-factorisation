@@ -107,12 +107,12 @@ if __name__ == "__main__":
         images = data["images"].squeeze(0)
         name = data["names"].pop()[0]
 
-        try:
-            img, mask = factorspeople.get_image(
-                data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
-            )
-        except Exception:
-            continue
+        # try:
+        img, mask = factorspeople.get_image(
+            data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
+        )
+        # except Exception:
+        #     continue
 
         gt = (img.detach() * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
 
