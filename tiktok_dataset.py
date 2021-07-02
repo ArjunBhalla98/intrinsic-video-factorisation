@@ -59,6 +59,7 @@ class TikTokDataset(Dataset):
 
                 self.images = []
                 self.masks = []
+                self.names = []
 
             video_imgs = glob.glob(f"{appended_path}/{folder}/images/*.png")
             video_masks = glob.glob(f"{appended_path}/{folder}/masks/*.png")

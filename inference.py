@@ -65,7 +65,7 @@ if __name__ == "__main__":
     dataset_test = TikTokDataset(
         ROOT_DIR, device, train=False, transform=transform, sample_size=BATCH_SIZE,
     )
-    test_loader = DataLoader(dataset_test)
+    test_loader = DataLoader(dataset_test, shuffle=False)
     print("Data Loaded")
 
     # Handle all model related stuff
@@ -107,12 +107,12 @@ if __name__ == "__main__":
         images = data["images"].squeeze(0)
         name = data["names"].pop()[0]
 
-        try:
-            img, mask = factorspeople.get_image(
-                data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
-            )
-        except Exception:
-            continue
+        # try:
+        img, mask = factorspeople.get_image(
+            data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
+        )
+        # except Exception:
+        #     continue
 
         gt = (img.detach() * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
 
@@ -136,6 +136,7 @@ if __name__ == "__main__":
 
         if SAVE_DIR:
             out_np = out.detach().cpu().numpy()
+            nonft_out_np = nonft_out.detach().cpu().numpy()
             gt_np = gt.detach().cpu().numpy()
             shading = factors["shading"].squeeze(0).permute(1, 2, 0)
             shading = shading / shading.max() * 255.0
@@ -154,16 +155,16 @@ if __name__ == "__main__":
             )
 
             imageio.imwrite(
-                SAVE_DIR + "/" + "gt_" + name, gt_np.astype(np.uint8),
+                SAVE_DIR + "/" + "nonft_" + name, nonft_out_np.astype(np.uint8),
             )
 
-            imageio.imwrite(
-                SAVE_DIR + "/" + "shading_" + name, shading_np.astype(np.uint8),
-            )
+            # imageio.imwrite(
+            #     SAVE_DIR + "/" + "shading_" + name, shading_np.astype(np.uint8),
+            # )
 
-            imageio.imwrite(
-                SAVE_DIR + "/" + "albedo_" + name, albedo_np.astype(np.uint8),
-            )
+            # imageio.imwrite(
+            #     SAVE_DIR + "/" + "albedo_" + name, albedo_np.astype(np.uint8),
+            # )
             # imsave(name, rendering.detach().cpu().numpy())
 
     if SAVE_DIR:
