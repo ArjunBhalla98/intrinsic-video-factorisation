@@ -182,6 +182,7 @@ if __name__ == "__main__":
             # images = images.to(device)
             # masks = masks.to(device)
 
+            torch.cuda.empty_cache()
             optimizer.zero_grad()
             #### PUT MODEL SPECIFIC FORWARD PASS CODE HERE ####
             #### FOR SIGGRAPH TRAINING ####
