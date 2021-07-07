@@ -141,9 +141,10 @@ if __name__ == "__main__":
     raft = torch.nn.DataParallel(RAFT(args))
     if RAFT_PATH:
         raft.load_state_dict(torch.load(RAFT_PATH, map_location=device))
+        raft_dev = torch.device("cuda:0")
 
     raft = raft.module
-    raft.to(device)
+    raft.to(raft_dev)
     raft.eval()
     optical_lambda = 0.1
 
