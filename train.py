@@ -10,8 +10,8 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 from tiktok_dataset import TikTokDataset
-from models.raft import RAFT
-from models.utils import InputPadder
+from models.RAFT.raft import RAFT
+from models.RAFT.utils import InputPadder
 from models.factor_people.fact_people_ops import *
 from loss.unsupervised_loss import optical_flow_loss
 
