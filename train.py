@@ -75,6 +75,8 @@ parser.add_argument(
     required=False,
 )
 
+parser.add_argument("--small")
+
 args = parser.parse_args()
 ROOT_DIR = args.root_dir
 N_EPOCHS = args.epochs
