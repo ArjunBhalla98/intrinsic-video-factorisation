@@ -191,6 +191,7 @@ if __name__ == "__main__":
             flow_idx = int(
                 first_img_str[first_img_str.rfind("/") + 1 : first_img_str.rfind(".")]
             )
+            print(flow_idx)
 
             img, mask = factorspeople.get_image(
                 data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
