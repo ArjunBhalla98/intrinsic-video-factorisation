@@ -189,7 +189,7 @@ if __name__ == "__main__":
             #### FOR SIGGRAPH TRAINING ####
             first_img_str = data["img_paths"][-1][0]
             flow_idx = int(
-                first_img_str[first_img_str.rfind("_") + 1 : first_img_str.rfind(".")]
+                first_img_str[first_img_str.rfind("/") + 1 : first_img_str.rfind(".")]
             )
 
             img, mask = factorspeople.get_image(
