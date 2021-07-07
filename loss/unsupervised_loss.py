@@ -46,7 +46,7 @@ def warp_img(im: torch.tensor, flow: np.array, device: torch.device) -> torch.te
     Warps image im according to the flow. n.b. im should be 1xCxHxW, flow should
     be 2xCxHxW
     """
-    im = im.cpu()
+    im = im.to(device)
     B, C, H, W = im.shape
 
     # build grid
@@ -61,7 +61,7 @@ def warp_img(im: torch.tensor, flow: np.array, device: torch.device) -> torch.te
     vgrid[:, 0, :, :] = 2.0 * vgrid[:, 0, :, :].clone() / max(W - 1, 1) - 1.0
     vgrid[:, 1, :, :] = 2.0 * vgrid[:, 1, :, :].clone() / max(H - 1, 1) - 1.0
 
-    vgrid = vgrid.permute(0, 2, 3, 1).cpu()
+    vgrid = vgrid.permute(0, 2, 3, 1).to(device)
     output = F.grid_sample(im, vgrid, align_corners=True)
 
-    return output
+    return output.to(device)
