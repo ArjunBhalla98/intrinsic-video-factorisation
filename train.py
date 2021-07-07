@@ -139,13 +139,14 @@ if __name__ == "__main__":
     factorspeople = FactorsPeople(all_dirs, device)
     raft = RAFT(args)
     raft = torch.nn.DataParallel(RAFT(args))
-    if RAFT_PATH:
-        raft.load_state_dict(torch.load(RAFT_PATH, map_location=device))
-        raft_dev = torch.device("cpu")
+    # if RAFT_PATH:
+    # raft.load_state_dict(torch.load(RAFT_PATH, map_location=device))
+    # raft_dev = torch.device("cpu")
+    flows = np.load("267_flow_full.npy")
 
-    raft = raft.module
-    raft.to(raft_dev)
-    raft.eval()
+    # raft = raft.module
+    # raft.to(raft_dev)
+    # raft.eval()
     optical_lambda = 0.1
 
     static_factor_model = FactorsPeople(all_dirs, device)
@@ -186,6 +187,11 @@ if __name__ == "__main__":
             optimizer.zero_grad()
             #### PUT MODEL SPECIFIC FORWARD PASS CODE HERE ####
             #### FOR SIGGRAPH TRAINING ####
+            first_img_str = data["img_paths"][-1][0]
+            flow_idx = int(
+                first_img_str[first_img_str.rfind("_") + 1 : first_img_str.rfind(".")]
+            )
+
             img, mask = factorspeople.get_image(
                 data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
             )
@@ -221,12 +227,14 @@ if __name__ == "__main__":
             albedo = factors["albedo"]
             albedo = albedo / albedo.max() * 255.0
 
-            img = img.to(raft_dev)
-            img2 = img2.to(raft_dev)
-            _, flow = raft(img, img2, iters=20, test_mode=True)
+            # img = img.to(raft_dev)
+            # img2 = img2.to(raft_dev)
+            # _, flow = raft(img, img2, iters=20, test_mode=True)
 
             optical_loss = (
-                optical_flow_loss(albedo, static_albedo_2, mask, flow, device)
+                optical_flow_loss(
+                    albedo, static_albedo_2, mask, flows[first_img_str], device
+                )
                 * optical_lambda
             )
             shading_loss = shading_albedo_loss(static_shading, shading) * shading_lambda
