@@ -53,14 +53,15 @@ def warp_img(im: np.array, flow: np.array, device: torch.device) -> torch.tensor
     yy = torch.arange(0, H).view(-1, 1).repeat(1, W)
     xx = xx.view(1, 1, H, W).repeat(B, 1, 1, 1)
     yy = yy.view(1, 1, H, W).repeat(B, 1, 1, 1)
-    grid = torch.cat((xx, yy), 1).float()
+    grid = torch.cat((xx, yy), 1).float().cpu()
 
     # update flow and normalise to range [-1,1]
     vgrid = Variable(grid) + flow
     vgrid[:, 0, :, :] = 2.0 * vgrid[:, 0, :, :].clone() / max(W - 1, 1) - 1.0
     vgrid[:, 1, :, :] = 2.0 * vgrid[:, 1, :, :].clone() / max(H - 1, 1) - 1.0
 
-    vgrid = vgrid.permute(0, 2, 3, 1)
-    output = F.grid_sample(torch.FloatTensor(im).cpu(), vgrid.cpu(), align_corners=True)
+    vgrid = vgrid.permute(0, 2, 3, 1).cpu()
+    im = torch.FloatTensor(im).cpu()
+    output = F.grid_sample(im, vgrid, align_corners=True)
 
     return output
