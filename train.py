@@ -220,6 +220,8 @@ if __name__ == "__main__":
             albedo = factors["albedo"]
             albedo = albedo / albedo.max() * 255.0
 
+            img = img.to(raft_dev)
+            img2 = img2.to(raft_dev)
             _, flow = raft(img, img2, iters=20, test_mode=True)
 
             optical_loss = (
