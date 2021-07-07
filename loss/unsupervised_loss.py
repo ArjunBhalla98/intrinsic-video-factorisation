@@ -61,7 +61,7 @@ def warp_img(im: np.array, flow: np.array, device: torch.device) -> torch.tensor
     vgrid[:, 1, :, :] = 2.0 * vgrid[:, 1, :, :].clone() / max(H - 1, 1) - 1.0
 
     vgrid = vgrid.permute(0, 2, 3, 1).cpu()
-    im = torch.FloatTensor(im).cpu()
+    im = torch.from_numpy(im).cpu()
     output = F.grid_sample(im, vgrid, align_corners=True)
 
     return output
