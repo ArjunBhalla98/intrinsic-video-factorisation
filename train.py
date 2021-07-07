@@ -125,7 +125,7 @@ if __name__ == "__main__":
     raft = RAFT(args)
     raft = torch.nn.DataParallel(RAFT(args))
     if RAFT_PATH:
-        raft.load_state_dict(torch.load(LOAD_PATH, map_location=device))
+        raft.load_state_dict(torch.load(RAFT_PATH, map_location=device))
 
     raft = raft.module
     raft.to(device)
