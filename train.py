@@ -225,7 +225,8 @@ if __name__ == "__main__":
             _, flow = raft(img, img2, iters=20, test_mode=True)
 
             optical_loss = (
-                optical_flow_loss(albedo, static_albedo_2, mask, flow) * optical_lambda
+                optical_flow_loss(albedo, static_albedo_2, mask, flow, device)
+                * optical_lambda
             )
             shading_loss = shading_albedo_loss(static_shading, shading) * shading_lambda
             albedo_loss = shading_albedo_loss(static_albedo, albedo) * albedo_lambda

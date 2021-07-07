@@ -29,19 +29,19 @@ def l2_mse_loss(predicted, gt):
     return loss
 
 
-def optical_flow_loss(alb1, alb2, mask1, flow):
+def optical_flow_loss(alb1, alb2, mask1, flow, device):
     """
     Computes the MSE between the albedo of 2 images. Uses optical flow correspondence 
     from the second image to find the corresponding RGB values in the first. Since
     it is albedo this should ideally have 0 MSE loss
     """
-    alb1_predicted = warp_img(alb2, flow) * mask1
+    alb1_predicted = warp_img(alb2, flow, device) * mask1
     criterion = nn.MSELoss()
     loss = criterion(alb1_predicted, alb1 * mask1)
     return loss
 
 
-def warp_img(im: np.array, flow: np.array) -> torch.tensor:
+def warp_img(im: np.array, flow: np.array, device: torch.device) -> torch.tensor:
     """
     Warps image im according to the flow. n.b. im should be 1xCxHxW, flow should
     be 2xCxHxW
@@ -61,6 +61,6 @@ def warp_img(im: np.array, flow: np.array) -> torch.tensor:
     vgrid[:, 1, :, :] = 2.0 * vgrid[:, 1, :, :].clone() / max(H - 1, 1) - 1.0
 
     vgrid = vgrid.permute(0, 2, 3, 1)
-    output = F.grid_sample(torch.FloatTensor(im), vgrid, align_corners=True)
+    output = F.grid_sample(torch.FloatTensor(im).to(device), vgrid, align_corners=True)
 
     return output
