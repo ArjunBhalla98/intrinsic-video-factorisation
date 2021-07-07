@@ -196,6 +196,12 @@ if __name__ == "__main__":
             img, img2 = padder.pad(img, img2)
             mask, mask2 = padder.pad(mask, mask2)
 
+            img = img.to(device)
+            mask = mask.to(device)
+
+            img2 = img2.to(device)
+            mask2 = mask2.to(device)
+
             gt = img.detach() * mask.detach()
             out, factors = factorspeople.reconstruct(img, mask)
             _, static_factors = static_factor_model.reconstruct(img, mask)
