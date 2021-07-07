@@ -191,7 +191,6 @@ if __name__ == "__main__":
             flow_idx = int(
                 first_img_str[first_img_str.rfind("/") + 1 : first_img_str.rfind(".")]
             )
-            print(flow_idx)
 
             img, mask = factorspeople.get_image(
                 data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
@@ -200,10 +199,6 @@ if __name__ == "__main__":
             img2, mask2 = factorspeople.get_image(
                 data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
             )
-
-            padder = InputPadder(img.shape)
-            img, img2 = padder.pad(img, img2)
-            mask, mask2 = padder.pad(mask, mask2)
 
             img = img.to(device)
             mask = mask.to(device)
@@ -227,10 +222,6 @@ if __name__ == "__main__":
 
             albedo = factors["albedo"]
             albedo = albedo / albedo.max() * 255.0
-
-            # img = img.to(raft_dev)
-            # img2 = img2.to(raft_dev)
-            # _, flow = raft(img, img2, iters=20, test_mode=True)
 
             optical_loss = (
                 optical_flow_loss(
