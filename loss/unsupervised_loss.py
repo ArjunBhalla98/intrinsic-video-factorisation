@@ -41,11 +41,12 @@ def optical_flow_loss(alb1, alb2, mask1, flow, device):
     return loss
 
 
-def warp_img(im: np.array, flow: np.array, device: torch.device) -> torch.tensor:
+def warp_img(im: torch.tensor, flow: np.array, device: torch.device) -> torch.tensor:
     """
     Warps image im according to the flow. n.b. im should be 1xCxHxW, flow should
     be 2xCxHxW
     """
+    im = im.cpu()
     B, C, H, W = im.shape
 
     # build grid
@@ -61,7 +62,6 @@ def warp_img(im: np.array, flow: np.array, device: torch.device) -> torch.tensor
     vgrid[:, 1, :, :] = 2.0 * vgrid[:, 1, :, :].clone() / max(H - 1, 1) - 1.0
 
     vgrid = vgrid.permute(0, 2, 3, 1).cpu()
-    im = torch.from_numpy(im).cpu()
     output = F.grid_sample(im, vgrid, align_corners=True)
 
     return output
