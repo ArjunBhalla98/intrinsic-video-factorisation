@@ -210,7 +210,14 @@ if __name__ == "__main__":
             running_loss += loss.item()
             loss.backward()
             optimizer.step()
-            wandb.log({"loss": loss.item()})
+            wandb.log(
+                {
+                    "loss": loss.item(),
+                    "shading loss": shading_loss.item(),
+                    "albedo loss": albedo_loss.item(),
+                    "optical loss": optical_loss.item(),
+                }
+            )
 
         epoch_batch_loss = running_loss / len(train_loader)
         print(f"Loss: {epoch_batch_loss}")
