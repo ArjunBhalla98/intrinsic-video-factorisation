@@ -234,7 +234,7 @@ if __name__ == "__main__":
 
             optical_loss = (
                 optical_flow_loss(
-                    albedo, static_albedo_2, mask, flows[first_img_str], device
+                    albedo, static_albedo_2, mask, flows[flow_idx], device
                 )
                 * optical_lambda
             )
