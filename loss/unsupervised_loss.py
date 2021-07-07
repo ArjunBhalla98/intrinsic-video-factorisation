@@ -1,4 +1,8 @@
 import torch
+import numpy as np
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.autograd import Variable
 
 """
 This file contains all loss functions that are "unsupervised" - i.e., they will take in only one tensor ideally,
@@ -23,3 +27,40 @@ def l2_mse_loss(predicted, gt):
     criterion = torch.nn.MSELoss()
     loss = criterion(predicted, gt)
     return loss
+
+
+def optical_flow_loss(alb1, alb2, mask1, flow):
+    """
+    Computes the MSE between the albedo of 2 images. Uses optical flow correspondence 
+    from the second image to find the corresponding RGB values in the first. Since
+    it is albedo this should ideally have 0 MSE loss
+    """
+    alb1_predicted = warp_img(alb2, flow) * mask1
+    criterion = nn.MSELoss()
+    loss = criterion(alb1_predicted, alb1 * mask1)
+    return loss
+
+
+def warp_img(im: np.array, flow: np.array) -> torch.tensor:
+    """
+    Warps image im according to the flow. n.b. im should be 1xCxHxW, flow should
+    be 2xCxHxW
+    """
+    B, C, H, W = im.shape
+
+    # build grid
+    xx = torch.arange(0, W).view(1, -1).repeat(H, 1)
+    yy = torch.arange(0, H).view(-1, 1).repeat(1, W)
+    xx = xx.view(1, 1, H, W).repeat(B, 1, 1, 1)
+    yy = yy.view(1, 1, H, W).repeat(B, 1, 1, 1)
+    grid = torch.cat((xx, yy), 1).float()
+
+    # update flow and normalise to range [-1,1]
+    vgrid = Variable(grid) + flow
+    vgrid[:, 0, :, :] = 2.0 * vgrid[:, 0, :, :].clone() / max(W - 1, 1) - 1.0
+    vgrid[:, 1, :, :] = 2.0 * vgrid[:, 1, :, :].clone() / max(H - 1, 1) - 1.0
+
+    vgrid = vgrid.permute(0, 2, 3, 1)
+    output = F.grid_sample(torch.FloatTensor(im), vgrid, align_corners=True)
+
+    return output
