@@ -67,6 +67,22 @@ parser.add_argument(
     "--dev", help="Cuda device if using GPU", type=str, default="0", required=False
 )
 
+##### RAFT arguments to satisfy the args argument for init
+
+parser.add_argument("--model", help="restore checkpoint")
+parser.add_argument("--path", help="dataset for evaluation")
+parser.add_argument("--small", action="store_true", help="use small model")
+parser.add_argument(
+    "--mixed_precision", action="store_true", help="use mixed precision"
+)
+parser.add_argument(
+    "--alternate_corr",
+    action="store_true",
+    help="use efficent correlation implementation",
+)
+
+#######
+
 parser.add_argument(
     "--raft_path",
     help="Path to the RAFT .pth",
