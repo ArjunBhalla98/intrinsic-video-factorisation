@@ -137,6 +137,7 @@ if __name__ == "__main__":
     ##### PUT TASK SPECIFIC PRE-TRAINING THINGS HERE #####
     all_dirs = get_model_dirs()
     factorspeople = FactorsPeople(all_dirs)
+    factorspeople = factorspeople.to(device)
     raft = RAFT(args)
     raft = torch.nn.DataParallel(RAFT(args))
     if RAFT_PATH:
@@ -149,6 +150,7 @@ if __name__ == "__main__":
 
     static_factor_model = FactorsPeople(all_dirs)
     static_factor_model.set_eval()
+    static_factor_model = static_factor_model.to(device)
     shading_albedo_loss = nn.MSELoss()
     shading_lambda = 0.1
     albedo_lambda = 0.1
