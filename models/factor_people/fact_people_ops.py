@@ -104,8 +104,8 @@ class FactorsPeople:
         human_mask[0] = torch.FloatTensor(input_mask.transpose(2, 0, 1))
         human_input[0] = torch.FloatTensor(input_img.transpose(2, 0, 1))
 
-        mask = human_mask.cuda()
-        tonemapped = human_input.cuda()
+        mask = human_mask
+        tonemapped = human_input
 
         return tonemapped, mask
 
@@ -123,7 +123,7 @@ class FactorsPeople:
             _,
             _,
             _,
-        ) = self.SH_model(image.cuda(), mask.cuda(), None, None)
+        ) = self.SH_model(image, mask, None, None)
 
         est_light = testTools.recoveryEnvLight(
             est_ground, torch.exp(est_sun_map), est_sun_intensity
@@ -153,7 +153,7 @@ class FactorsPeople:
             shading = self.get_shading(image, mask)
         est_albedo = self.albedo_net(torch.cat([image, shading, mask], dim=1))
         est_albedo = torch.clamp(est_albedo, 0.0, 1.0)
-        est_albedo = est_albedo * mask.cuda()
+        est_albedo = est_albedo * mask
 
         # shading_map = torch.sum(shading, dim=1, keepdim=True)  # ???
         # shading_map = shading_map / torch.clamp(shading_map.max(), min=1e-5)
