@@ -554,8 +554,8 @@ class LightNet_Hybrid(nn.Module):
     def getEnvLightConf(self, shlight):
         light = shlight.reshape(shlight.shape[0], 3, 9, 1, 1)
         light = light.to(self.device)
-        env_transport_tensor = env_transport_tensor.to(device)
-        envlight = torch.sum(light * env_transport_tensor, dim=2)
+        en = env_transport_tensor.to(self.device)
+        envlight = torch.sum(light * en, dim=2)
 
         Intensity = torch.sum(torch.clamp(envlight, 0.0, float("inf")), dim=1).reshape(
             envlight.shape[0], -1
