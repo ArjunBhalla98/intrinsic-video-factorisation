@@ -1,3 +1,4 @@
+import os
 import torch
 import argparse
 from tqdm import tqdm
@@ -102,6 +103,9 @@ if __name__ == "__main__":
 
     if LOAD_PATH:
         model.load_state_dict(torch.load(LOAD_PATH))
+
+    if SAVE_DIR and not os.path.isdir(SAVE_DIR):
+        os.mkdir(SAVE_DIR)
 
     print("Model and auxillary components initialized")
 
