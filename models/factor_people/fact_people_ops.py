@@ -26,7 +26,9 @@ class FactorsPeople:
         self.device = device
 
         # load models
-        self.albedo_net = network.Unet_Blurpooling_General(input_channel=7)
+        self.albedo_net = network.Unet_Blurpooling_General(
+            input_channel=7, device=device
+        )
         # self.albedo_net = nn.DataParallel(self.albedo_net, device_ids=[0, 1])
         self.albedo_net = self.albedo_net.to(device)
         checkpoint = torch.load(albedo_net_path)
