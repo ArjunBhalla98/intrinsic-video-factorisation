@@ -26,29 +26,29 @@ class FactorsPeople:
         self.albedo_net = network.Unet_Blurpooling_General(input_channel=7)
         self.albedo_net = nn.DataParallel(self.albedo_net)
         checkpoint = torch.load(albedo_net_path)
-        self.albedo_net.load_state_dict(checkpoint["model"])
+        self.albedo_net.module.load_state_dict(checkpoint["model"])
         self.albedo_net.cuda_kernels()
 
         self.SH_model = network_light.LightNet_Hybrid(16, input_channel=4)
         self.SH_model = nn.DataParallel(self.SH_model)
         checkpoint = torch.load(SH_model_path)
-        self.SH_model.load_state_dict(checkpoint["model"])
+        self.SH_model.module.load_state_dict(checkpoint["model"])
 
         self.shading_net = network.Unet_Blurpooling_General_Light()
         self.shading_net = nn.DataParallel(self.shading_net)
         checkpoint = torch.load(shading_net_path)
-        self.shading_net.load_state_dict(checkpoint["model"])
+        self.shading_net.module.load_state_dict(checkpoint["model"])
         self.shading_net.cuda_kernels()
 
         self.self_shading_net = network.SepNetComplete_Shading(f_channel=16)
         self.self_shading_net = nn.DataParallel(self.self_shading_net)
         checkpoint = torch.load(self_shading_net_path)
-        self.self_shading_net.load_state_dict(checkpoint["model"])
+        self.self_shading_net.module.load_state_dict(checkpoint["model"])
 
         self.shadow_net = network.Unet_Blurpooling_Shadow()
         self.shadow_net = nn.DataParallel(self.shadow_net)
         checkpoint = torch.load(shadow_net_path)
-        self.shadow_net.load_state_dict(checkpoint["model"])
+        self.shadow_net.module.load_state_dict(checkpoint["model"])
         self.shadow_net.cuda_kernels()
 
         self.refine_rendering_net = network.Unet_Blurpooling_General_Light(
@@ -56,7 +56,7 @@ class FactorsPeople:
         )
         self.refine_rendering_net = nn.DataParallel(self.refine_rendering_net)
         checkpoint = torch.load(refine_rendering_net_path)
-        self.refine_rendering_net.load_state_dict(checkpoint["model"])
+        self.refine_rendering_net.module.load_state_dict(checkpoint["model"])
         self.refine_rendering_net.cuda_kernels()
 
         self.refine_net = BlLayer.BilateralSolver()
@@ -70,14 +70,20 @@ class FactorsPeople:
         self.refine_rendering_net.eval()
 
     def load_model_state(self, model_state_dict):
-        self.self_shading_net.load_state_dict(
+        self.self_shading_net.module.load_state_dict(
             torch.load(model_state_dict["self_shading_net"])
         )
-        self.shading_net.load_state_dict(torch.load(model_state_dict["shading_net"]))
-        self.SH_model.load_state_dict(torch.load(model_state_dict["SH_model"]))
-        self.albedo_net.load_state_dict(torch.load(model_state_dict["albedo_net"]))
-        self.shadow_net.load_state_dict(torch.load(model_state_dict["shadow_net"]))
-        self.refine_rendering_net.load_state_dict(
+        self.shading_net.module.load_state_dict(
+            torch.load(model_state_dict["shading_net"])
+        )
+        self.SH_model.module.load_state_dict(torch.load(model_state_dict["SH_model"]))
+        self.albedo_net.module.load_state_dict(
+            torch.load(model_state_dict["albedo_net"])
+        )
+        self.shadow_net.module.load_state_dict(
+            torch.load(model_state_dict["shadow_net"])
+        )
+        self.refine_rendering_net.module.load_state_dict(
             torch.load(model_state_dict["refine_rendering_net"])
         )
 
