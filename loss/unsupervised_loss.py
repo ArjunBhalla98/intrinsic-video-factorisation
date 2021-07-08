@@ -54,14 +54,14 @@ def warp_img(im: torch.tensor, flow: np.array, device: torch.device) -> torch.te
     yy = torch.arange(0, H).view(-1, 1).repeat(1, W)
     xx = xx.view(1, 1, H, W).repeat(B, 1, 1, 1)
     yy = yy.view(1, 1, H, W).repeat(B, 1, 1, 1)
-    grid = torch.cat((xx, yy), 1).float().cpu()
+    grid = torch.cat((xx, yy), 1).float()
 
     # update flow and normalise to range [-1,1]
     vgrid = Variable(grid) + flow
     vgrid[:, 0, :, :] = 2.0 * vgrid[:, 0, :, :].clone() / max(W - 1, 1) - 1.0
     vgrid[:, 1, :, :] = 2.0 * vgrid[:, 1, :, :].clone() / max(H - 1, 1) - 1.0
 
-    vgrid = vgrid.permute(0, 2, 3, 1).to(device)
+    vgrid = vgrid.permute(0, 2, 3, 1)
     output = F.grid_sample(im, vgrid, align_corners=True)
 
     return output.to(device)

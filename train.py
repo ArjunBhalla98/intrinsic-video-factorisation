@@ -200,11 +200,11 @@ if __name__ == "__main__":
                 data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
             )
 
-            img = img.to(device)
-            mask = mask.to(device)
+            # img = img.to(device)
+            # mask = mask.to(device)
 
-            img2 = img2.to(device)
-            mask2 = mask2.to(device)
+            # img2 = img2.to(device)
+            # mask2 = mask2.to(device)
 
             gt = img.detach() * mask.detach()
             out, factors = factorspeople.reconstruct(img, mask)
