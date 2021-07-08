@@ -874,7 +874,7 @@ class Unet_Blurpooling_General(nn.Module):
             )  # 512 -> 512
 
     def blurpooling(self, x, i):
-        x = x.to(self.device)
+        x = x.to(self.conv0.device)
         return F.conv2d(x, self.kernel_list[i], stride=2, padding=1)
 
     def cuda_kernels(self):
