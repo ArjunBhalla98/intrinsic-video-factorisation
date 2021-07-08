@@ -25,33 +25,35 @@ class FactorsPeople:
 
         # load models
         self.albedo_net = network.Unet_Blurpooling_General(input_channel=7)
-        self.albedo_net = nn.DataParallel(self.albedo_net)
+        self.albedo_net = nn.DataParallel(self.albedo_net, device_ids=[0, 1])
         self.albedo_net = self.albedo_net.to(device)
         checkpoint = torch.load(albedo_net_path)
         self.albedo_net.module.load_state_dict(checkpoint["model"])
         self.albedo_net.module.cuda_kernels()
 
         self.SH_model = network_light.LightNet_Hybrid(16, input_channel=4)
-        self.SH_model = nn.DataParallel(self.SH_model)
+        self.SH_model = nn.DataParallel(self.SH_model, device_ids=[0, 1])
         self.SH_model = self.SH_model.to(device)
         checkpoint = torch.load(SH_model_path)
         self.SH_model.module.load_state_dict(checkpoint["model"])
 
         self.shading_net = network.Unet_Blurpooling_General_Light()
-        self.shading_net = nn.DataParallel(self.shading_net)
+        self.shading_net = nn.DataParallel(self.shading_net, device_ids=[0, 1])
         self.shading_net = self.shading_net.to(device)
         checkpoint = torch.load(shading_net_path)
         self.shading_net.module.load_state_dict(checkpoint["model"])
         self.shading_net.module.cuda_kernels()
 
         self.self_shading_net = network.SepNetComplete_Shading(f_channel=16)
-        self.self_shading_net = nn.DataParallel(self.self_shading_net)
+        self.self_shading_net = nn.DataParallel(
+            self.self_shading_net, device_ids=[0, 1]
+        )
         self.self_shading_net = self.self_shading_net.to(device)
         checkpoint = torch.load(self_shading_net_path)
         self.self_shading_net.module.load_state_dict(checkpoint["model"])
 
         self.shadow_net = network.Unet_Blurpooling_Shadow()
-        self.shadow_net = nn.DataParallel(self.shadow_net)
+        self.shadow_net = nn.DataParallel(self.shadow_net, device_ids=[0, 1])
         self.shadow_net = self.shadow_net.to(device)
         checkpoint = torch.load(shadow_net_path)
         self.shadow_net.module.load_state_dict(checkpoint["model"])
@@ -60,7 +62,9 @@ class FactorsPeople:
         self.refine_rendering_net = network.Unet_Blurpooling_General_Light(
             input_channel=6
         )
-        self.refine_rendering_net = nn.DataParallel(self.refine_rendering_net)
+        self.refine_rendering_net = nn.DataParallel(
+            self.refine_rendering_net, device_ids=[0, 1]
+        )
         self.refine_rendering_net = self.refine_rendering_net.to(device)
         checkpoint = torch.load(refine_rendering_net_path)
         self.refine_rendering_net.module.load_state_dict(checkpoint["model"])
