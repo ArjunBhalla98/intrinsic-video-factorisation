@@ -92,11 +92,11 @@ if __name__ == "__main__":
         "refine_rendering_net": f"models/states/{LOAD_PREFIX}rrn.pth",
     }
     all_dirs = get_model_dirs()
-    factorspeople = FactorsPeople(all_dirs, device)
+    factorspeople = FactorsPeople(all_dirs, device=device)
     factorspeople.load_model_state(model_states_trained)
     factorspeople.set_eval()
 
-    nonft_factor_model = FactorsPeople(all_dirs, device)
+    nonft_factor_model = FactorsPeople(all_dirs, device=device)
     nonft_factor_model.set_eval()
     # model.train_dropout = False  # relighting humans
 

@@ -202,6 +202,8 @@ class FactorsPeople:
         }
 
     def reconstruct(self, image, mask):
+        image = image.to(self.device)
+        mask = mask.to(self.device)
         factors = self.factor(image, mask)
         reconstruct = testTools.composition(
             factors["albedo"], factors["shading"], mask, image, factors["shadow"]
