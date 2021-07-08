@@ -28,21 +28,21 @@ class FactorsPeople:
         # self.albedo_net = nn.DataParallel(self.albedo_net, device_ids=[0, 1])
         self.albedo_net = self.albedo_net.to(device)
         checkpoint = torch.load(albedo_net_path)
-        self.albedo_net.module.load_state_dict(checkpoint["model"])
-        self.albedo_net.module.cuda_kernels()
+        self.albedo_net.load_state_dict(checkpoint["model"])
+        self.albedo_net.cuda_kernels()
 
         self.SH_model = network_light.LightNet_Hybrid(16, input_channel=4)
         # self.SH_model = nn.DataParallel(self.SH_model, device_ids=[0, 1])
         self.SH_model = self.SH_model.to(device)
         checkpoint = torch.load(SH_model_path)
-        self.SH_model.module.load_state_dict(checkpoint["model"])
+        self.SH_model.load_state_dict(checkpoint["model"])
 
         self.shading_net = network.Unet_Blurpooling_General_Light()
         # self.shading_net = nn.DataParallel(self.shading_net, device_ids=[0, 1])
         self.shading_net = self.shading_net.to(device)
         checkpoint = torch.load(shading_net_path)
-        self.shading_net.module.load_state_dict(checkpoint["model"])
-        self.shading_net.module.cuda_kernels()
+        self.shading_net.load_state_dict(checkpoint["model"])
+        self.shading_net.cuda_kernels()
 
         self.self_shading_net = network.SepNetComplete_Shading(f_channel=16)
         # self.self_shading_net = nn.DataParallel(
@@ -50,14 +50,14 @@ class FactorsPeople:
         # )
         self.self_shading_net = self.self_shading_net.to(device)
         checkpoint = torch.load(self_shading_net_path)
-        self.self_shading_net.module.load_state_dict(checkpoint["model"])
+        self.self_shading_net.load_state_dict(checkpoint["model"])
 
         self.shadow_net = network.Unet_Blurpooling_Shadow()
         # self.shadow_net = nn.DataParallel(self.shadow_net, device_ids=[0, 1])
         self.shadow_net = self.shadow_net.to(device)
         checkpoint = torch.load(shadow_net_path)
-        self.shadow_net.module.load_state_dict(checkpoint["model"])
-        self.shadow_net.module.cuda_kernels()
+        self.shadow_net.load_state_dict(checkpoint["model"])
+        self.shadow_net.cuda_kernels()
 
         self.refine_rendering_net = network.Unet_Blurpooling_General_Light(
             input_channel=6
@@ -67,8 +67,8 @@ class FactorsPeople:
         # )
         self.refine_rendering_net = self.refine_rendering_net.to(device)
         checkpoint = torch.load(refine_rendering_net_path)
-        self.refine_rendering_net.module.load_state_dict(checkpoint["model"])
-        self.refine_rendering_net.module.cuda_kernels()
+        self.refine_rendering_net.load_state_dict(checkpoint["model"])
+        self.refine_rendering_net.cuda_kernels()
 
         self.refine_net = BlLayer.BilateralSolver()
 
@@ -81,20 +81,14 @@ class FactorsPeople:
         self.refine_rendering_net.eval()
 
     def load_model_state(self, model_state_dict):
-        self.self_shading_net.module.load_state_dict(
+        self.self_shading_net.load_state_dict(
             torch.load(model_state_dict["self_shading_net"])
         )
-        self.shading_net.module.load_state_dict(
-            torch.load(model_state_dict["shading_net"])
-        )
-        self.SH_model.module.load_state_dict(torch.load(model_state_dict["SH_model"]))
-        self.albedo_net.module.load_state_dict(
-            torch.load(model_state_dict["albedo_net"])
-        )
-        self.shadow_net.module.load_state_dict(
-            torch.load(model_state_dict["shadow_net"])
-        )
-        self.refine_rendering_net.module.load_state_dict(
+        self.shading_net.load_state_dict(torch.load(model_state_dict["shading_net"]))
+        self.SH_model.load_state_dict(torch.load(model_state_dict["SH_model"]))
+        self.albedo_net.load_state_dict(torch.load(model_state_dict["albedo_net"]))
+        self.shadow_net.load_state_dict(torch.load(model_state_dict["shadow_net"]))
+        self.refine_rendering_net.load_state_dict(
             torch.load(model_state_dict["refine_rendering_net"])
         )
 
