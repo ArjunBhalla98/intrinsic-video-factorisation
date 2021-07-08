@@ -23,6 +23,8 @@ class FactorsPeople:
         shadow_net_path = all_dirs["shadow_net"]
         refine_rendering_net_path = all_dirs["refine_rendering_net"]
 
+        self.device = device
+
         # load models
         self.albedo_net = network.Unet_Blurpooling_General(input_channel=7)
         # self.albedo_net = nn.DataParallel(self.albedo_net, device_ids=[0, 1])
@@ -31,7 +33,9 @@ class FactorsPeople:
         self.albedo_net.load_state_dict(checkpoint["model"])
         self.albedo_net.cuda_kernels()
 
-        self.SH_model = network_light.LightNet_Hybrid(16, input_channel=4)
+        self.SH_model = network_light.LightNet_Hybrid(
+            16, input_channel=4, device=device
+        )
         # self.SH_model = nn.DataParallel(self.SH_model, device_ids=[0, 1])
         self.SH_model = self.SH_model.to(device)
         checkpoint = torch.load(SH_model_path)
