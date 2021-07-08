@@ -114,7 +114,7 @@ if __name__ == "__main__":
         dev = "cpu"
 
     device = torch.device(dev)
-
+    device_2 = torch.device("cuda:1")
     # Handle all data loading and related stuff
     transform = transforms.Compose([transforms.ToTensor()])
     dataset_train = TikTokDataset(
@@ -137,18 +137,10 @@ if __name__ == "__main__":
     ##### PUT TASK SPECIFIC PRE-TRAINING THINGS HERE #####
     all_dirs = get_model_dirs()
     factorspeople = FactorsPeople(all_dirs, device)
-    raft = RAFT(args)
-    raft = torch.nn.DataParallel(RAFT(args))
-    # if RAFT_PATH:
-    # raft.load_state_dict(torch.load(RAFT_PATH, map_location=device))
     flows = np.load("267_flow_full.npy")
-
-    # raft = raft.module
-    # raft.to(raft_dev)
-    # raft.eval()
     optical_lambda = 0.1
 
-    static_factor_model = FactorsPeople(all_dirs, device)
+    static_factor_model = FactorsPeople(all_dirs, device_2)
     static_factor_model.set_eval()
     shading_albedo_loss = nn.MSELoss()
     shading_lambda = 0.1
@@ -176,11 +168,6 @@ if __name__ == "__main__":
         running_loss = 0
 
         for i, data in tqdm(enumerate(train_loader), total=len(train_loader)):
-            # masks = data["masks"].squeeze(0)
-            # images = data["images"].squeeze(0)
-
-            # images = images.to(device)
-            # masks = masks.to(device)
 
             torch.cuda.empty_cache()
             optimizer.zero_grad()
@@ -202,8 +189,8 @@ if __name__ == "__main__":
             img = img.to(device)
             mask = mask.to(device)
 
-            img2 = img2.to(device)
-            mask2 = mask2.to(device)
+            img2 = img2.to(device_2)
+            mask2 = mask2.to(device_2)
 
             gt = img.detach() * mask.detach()
             out, factors = factorspeople.reconstruct(img, mask)
