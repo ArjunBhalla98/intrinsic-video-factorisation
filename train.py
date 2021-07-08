@@ -141,7 +141,6 @@ if __name__ == "__main__":
     raft = torch.nn.DataParallel(RAFT(args))
     # if RAFT_PATH:
     # raft.load_state_dict(torch.load(RAFT_PATH, map_location=device))
-    # raft_dev = torch.device("cpu")
     flows = np.load("267_flow_full.npy")
 
     # raft = raft.module
@@ -200,11 +199,11 @@ if __name__ == "__main__":
                 data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
             )
 
-            # img = img.to(device)
-            # mask = mask.to(device)
+            img = img.to(device)
+            mask = mask.to(device)
 
-            # img2 = img2.to(device)
-            # mask2 = mask2.to(device)
+            img2 = img2.to(device)
+            mask2 = mask2.to(device)
 
             gt = img.detach() * mask.detach()
             out, factors = factorspeople.reconstruct(img, mask)

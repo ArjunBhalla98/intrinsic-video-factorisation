@@ -1,3 +1,4 @@
+from os import device_encoding
 import torch
 import numpy as np
 from PIL import Image
@@ -12,7 +13,7 @@ import models.factor_people.networks.testTools as testTools
 # define a class that takes input image and return factors and a reconstruction or relighting, or insertion
 class FactorsPeople:
     # load models
-    def __init__(self, all_dirs, device=torch.device("cuda")):
+    def __init__(self, all_dirs, device=torch.device("cuda:0")):
         super(FactorsPeople, self).__init__()
 
         self_shading_net_path = all_dirs["self_shading_net"]
@@ -25,28 +26,33 @@ class FactorsPeople:
         # load models
         self.albedo_net = network.Unet_Blurpooling_General(input_channel=7)
         self.albedo_net = nn.DataParallel(self.albedo_net)
+        self.albedo_net = self.albedo_net.to(device)
         checkpoint = torch.load(albedo_net_path)
         self.albedo_net.module.load_state_dict(checkpoint["model"])
         self.albedo_net.module.cuda_kernels()
 
         self.SH_model = network_light.LightNet_Hybrid(16, input_channel=4)
         self.SH_model = nn.DataParallel(self.SH_model)
+        self.SH_model = self.SH_model.to(device)
         checkpoint = torch.load(SH_model_path)
         self.SH_model.module.load_state_dict(checkpoint["model"])
 
         self.shading_net = network.Unet_Blurpooling_General_Light()
         self.shading_net = nn.DataParallel(self.shading_net)
+        self.shading_net = self.shading_net.to(device)
         checkpoint = torch.load(shading_net_path)
         self.shading_net.module.load_state_dict(checkpoint["model"])
         self.shading_net.module.cuda_kernels()
 
         self.self_shading_net = network.SepNetComplete_Shading(f_channel=16)
         self.self_shading_net = nn.DataParallel(self.self_shading_net)
+        self.self_shading_net = self.self_shading_net.to(device)
         checkpoint = torch.load(self_shading_net_path)
         self.self_shading_net.module.load_state_dict(checkpoint["model"])
 
         self.shadow_net = network.Unet_Blurpooling_Shadow()
         self.shadow_net = nn.DataParallel(self.shadow_net)
+        self.shadow_net = self.shadow_net.to(device)
         checkpoint = torch.load(shadow_net_path)
         self.shadow_net.module.load_state_dict(checkpoint["model"])
         self.shadow_net.module.cuda_kernels()
@@ -55,6 +61,7 @@ class FactorsPeople:
             input_channel=6
         )
         self.refine_rendering_net = nn.DataParallel(self.refine_rendering_net)
+        self.refine_rendering_net = self.refine_rendering_net.to(device)
         checkpoint = torch.load(refine_rendering_net_path)
         self.refine_rendering_net.module.load_state_dict(checkpoint["model"])
         self.refine_rendering_net.module.cuda_kernels()
