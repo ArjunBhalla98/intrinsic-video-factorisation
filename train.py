@@ -197,7 +197,6 @@ if __name__ == "__main__":
 
             img = img.to(device_2)
             mask = mask.to(device_2)
-            print(static_factor_model.SH_model.device, img.device, mask.device)
             _, static_factors = static_factor_model.reconstruct(img, mask)
             _, static_factors_2 = static_factor_model.reconstruct(img2, mask2)
             static_shading = static_factors["shading"]

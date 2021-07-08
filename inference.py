@@ -44,6 +44,14 @@ parser.add_argument(
     "--log", help="Log if required on wandb", type=bool, default=False, required=False
 )
 
+parser.add_argument(
+    "--load_prefix",
+    help="Prefix for the models to load",
+    type=str,
+    required=False,
+    default="opt_loss_reg_",
+)
+
 args = parser.parse_args()
 ROOT_DIR = args.root_dir
 CUDA_DEV = args.dev
@@ -51,6 +59,7 @@ LOAD_PATH = args.load_state
 SAVE_DIR = args.save_dir
 LOG = args.log
 BATCH_SIZE = 1
+LOAD_PREFIX = args.load_prefix
 
 if __name__ == "__main__":
     if torch.cuda.is_available():
@@ -63,7 +72,7 @@ if __name__ == "__main__":
     # Handle all data loading and related stuff
     transform = transforms.Compose([transforms.ToTensor()])
     dataset_test = TikTokDataset(
-        ROOT_DIR, device, train=False, transform=transform, sample_size=BATCH_SIZE,
+        ROOT_DIR, device, train=True, transform=transform, sample_size=BATCH_SIZE,
     )
     test_loader = DataLoader(dataset_test, shuffle=False)
     print("Data Loaded")
@@ -75,12 +84,12 @@ if __name__ == "__main__":
 
     ##### PUT TASK SPECIFIC PRE-INFERENCE THINGS HERE #####
     model_states_trained = {
-        "self_shading_net": "models/states/shad_alb_reg_ssn.pth",
-        "shading_net": "models/states/shad_alb_reg_sn.pth",
-        "SH_model": "models/states/shad_alb_reg_sh.pth",
-        "albedo_net": "models/states/shad_alb_reg_albedo.pth",
-        "shadow_net": "models/states/shad_alb_reg_shadow.pth",
-        "refine_rendering_net": "models/states/shad_alb_reg_rrn.pth",
+        "self_shading_net": f"models/states/{LOAD_PREFIX}ssn.pth",
+        "shading_net": f"models/states/{LOAD_PREFIX}sn.pth",
+        "SH_model": f"models/states/{LOAD_PREFIX}sh.pth",
+        "albedo_net": f"models/states/{LOAD_PREFIX}albedo.pth",
+        "shadow_net": f"models/states/{LOAD_PREFIX}shadow.pth",
+        "refine_rendering_net": f"models/states/{LOAD_PREFIX}rrn.pth",
     }
     all_dirs = get_model_dirs()
     factorspeople = FactorsPeople(all_dirs)
