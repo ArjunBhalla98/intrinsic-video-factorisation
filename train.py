@@ -194,6 +194,9 @@ if __name__ == "__main__":
 
             gt = img.detach() * mask.detach()
             out, factors = factorspeople.reconstruct(img, mask)
+
+            img = img.to(device_2)
+            mask = mask.to(device_2)
             _, static_factors = static_factor_model.reconstruct(img, mask)
             _, static_factors_2 = static_factor_model.reconstruct(img2, mask2)
             static_shading = static_factors["shading"]
