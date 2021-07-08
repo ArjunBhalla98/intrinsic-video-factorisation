@@ -181,7 +181,7 @@ def recoveryEnvLight(ground, sun_map_exp, sun_intensity):
     sun_map_exp = sun_map_exp / torch.max(
         sun_map_exp.reshape(sun_map_exp.shape[0], -1), dim=1
     )[0].reshape(sun_map_exp.shape[0], 1, 1, 1)
-    ground_map = recoverySH_Tensor(ground)
+    ground_map = recoverySH_Tensor(ground).to(ground.device)
     light_full = ground_map + sun_map_exp * sun_intensity.reshape(
         sun_intensity.shape[0], 3, 1, 1
     )
