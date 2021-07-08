@@ -228,8 +228,8 @@ if __name__ == "__main__":
             albedo_loss = shading_albedo_loss(static_albedo, albedo) * albedo_lambda
             ####################################################
             # add shading loss and albedo loss to this for the SIGGRAPH
-            out = out.to(device)
-            gt = gt.to(device)
+            out = out.to(device_2)
+            gt = gt.to(device_2)
             reconstruction_loss = criterion(out, gt)
             loss = reconstruction_loss + optical_loss + shading_loss + albedo_loss
             running_loss += loss.item()
