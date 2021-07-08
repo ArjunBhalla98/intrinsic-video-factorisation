@@ -231,6 +231,10 @@ if __name__ == "__main__":
             out = out.to(device_2)
             gt = gt.to(device_2)
             reconstruction_loss = criterion(out, gt)
+            reconstruction_loss = reconstruction_loss.to(device)
+            optical_loss = optical_loss.to(device)
+            shading_loss = shading_loss.to(device)
+            albedo_loss = albedo_loss.to(device)
             loss = reconstruction_loss + optical_loss + shading_loss + albedo_loss
             running_loss += loss.item()
             loss.backward()
