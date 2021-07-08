@@ -120,6 +120,11 @@ if __name__ == "__main__":
             data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
         )
 
+        img = img.to(device)
+        mask = mask.to(device)
+        images = images.to(device)
+        masks = masks.to(device)
+
         gt = (img.detach() * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
 
         nonft_reconstruction, nonft_factors = nonft_factor_model.reconstruct(img, mask)
