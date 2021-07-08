@@ -140,6 +140,9 @@ class FactorsPeople:
             _,
             _,
         ) = self.SH_model(image, mask, None, None)
+        est_ground = est_ground.to(self.device)
+        est_sun_map = est_sun_map.to(self.device)
+        est_sun_intensity = est_sun_intensity.to(self.device)
 
         est_light = testTools.recoveryEnvLight(
             est_ground, torch.exp(est_sun_map), est_sun_intensity
