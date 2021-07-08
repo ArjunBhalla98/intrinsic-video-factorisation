@@ -919,12 +919,14 @@ class Unet_Blurpooling_General(nn.Module):
 
 
 class Unet_Blurpooling_General_Light(nn.Module):
-    def __init__(self, num_group=16, input_channel=4):
+    def __init__(self, num_group=16, input_channel=4, device=torch.device("cuda:0")):
         super(Unet_Blurpooling_General_Light, self).__init__()
 
         bk = torch.FloatTensor([[1, 2, 1], [2, 4, 2], [1, 2, 1]]).reshape(1, 1, 3, 3)
         bk = bk / torch.sum(bk)
         self.kernel_list = []
+
+        self.device = device
 
         for i in range(4):
             c = 64 * (2 ** i)
@@ -1007,6 +1009,8 @@ class Unet_Blurpooling_General_Light(nn.Module):
         )  # 512 -> 512
 
     def blurpooling(self, x, i):
+        x = x.to(self.device)
+        self.kernel_list[i] = self.kernel_list[i].to(self.device)
         return F.conv2d(x, self.kernel_list[i], stride=2, padding=1)
 
     def cuda_kernels(self):

@@ -43,7 +43,7 @@ class FactorsPeople:
         checkpoint = torch.load(SH_model_path)
         self.SH_model.load_state_dict(checkpoint["model"])
 
-        self.shading_net = network.Unet_Blurpooling_General_Light()
+        self.shading_net = network.Unet_Blurpooling_General_Light(device=device)
         # self.shading_net = nn.DataParallel(self.shading_net, device_ids=[0, 1])
         self.shading_net = self.shading_net.to(device)
         checkpoint = torch.load(shading_net_path)
