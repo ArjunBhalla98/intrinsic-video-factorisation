@@ -3,11 +3,14 @@ import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
+import imageio
 
 """
 This file contains all loss functions that are "unsupervised" - i.e., they will take in only one tensor ideally,
 which should be a tensor containing n image samples. See specific examples and docstrings.
 """
+
+i = 1
 
 
 def l1_loss(results):
@@ -39,6 +42,14 @@ def optical_flow_loss(alb1, alb2, mask1, flow, device):
     alb2 = alb2.to(device)
     mask1 = mask1.to(device)
     alb1_predicted = warp_img(alb2, flow, device) * mask1
+    imageio.imsave(
+        f"loss_pics/alb_{i}_predicted.png",
+        alb1_predicted.detach().cpu().permute(1, 2, 0).numpy(),
+    )
+    imageio.imsave(
+        f"loss_pics/alb_{i}.png", alb1.detach().cpu().permute(1, 2, 0).numpy()
+    )
+    i += 1
     criterion = nn.MSELoss()
     loss = criterion(alb1_predicted, alb1 * mask1)
     return loss
