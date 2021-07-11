@@ -125,7 +125,7 @@ if __name__ == "__main__":
         sample_size=BATCH_SIZE,
         # squarize_size=1024,
     )
-    train_loader = DataLoader(dataset_train, shuffle=True)
+    train_loader = DataLoader(dataset_train, shuffle=False)
     print("Data Loaded")
 
     # Handle all model related stuff
@@ -179,11 +179,11 @@ if __name__ == "__main__":
                 first_img_str[first_img_str.rfind("/") + 1 : first_img_str.rfind(".")]
             )
 
-            img2, mask2 = factorspeople.get_image(
+            img, mask = factorspeople.get_image(
                 data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
             )
 
-            img, mask = factorspeople.get_image(
+            img2, mask2 = factorspeople.get_image(
                 data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
             )
 
