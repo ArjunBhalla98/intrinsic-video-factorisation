@@ -38,6 +38,7 @@ def optical_flow_loss(alb1, alb2, mask1, flow, device):
     from the second image to find the corresponding RGB values in the first. Since
     it is albedo this should ideally have 0 MSE loss
     """
+    global i
     alb1 = alb1.to(device)
     alb2 = alb2.to(device)
     mask1 = mask1.to(device)
