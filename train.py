@@ -125,7 +125,7 @@ if __name__ == "__main__":
         sample_size=BATCH_SIZE,
         # squarize_size=1024,
     )
-    train_loader = DataLoader(dataset_train, shuffle=False)
+    train_loader = DataLoader(dataset_train, shuffle=True)
     print("Data Loaded")
 
     # Handle all model related stuff
@@ -185,15 +185,6 @@ if __name__ == "__main__":
 
             img2, mask2 = factorspeople.get_image(
                 data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
-            )
-
-            imageio.imsave(
-                f"loss_pics/alb_{i}_1.png",
-                img.detach().squeeze(0).permute(1, 2, 0).cpu().numpy(),
-            )
-            imageio.imsave(
-                f"loss_pics/alb_{i}_2.png",
-                img2.detach().squeeze(0).permute(1, 2, 0).cpu().numpy(),
             )
 
             img = img.to(device)
