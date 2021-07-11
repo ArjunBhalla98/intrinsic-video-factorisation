@@ -174,20 +174,15 @@ if __name__ == "__main__":
             #### PUT MODEL SPECIFIC FORWARD PASS CODE HERE ####
             #### FOR SIGGRAPH TRAINING ####
             first_img_str = data["img_paths"][-1][0]
-            flow_idx = (
-                int(
-                    first_img_str[
-                        first_img_str.rfind("/") + 1 : first_img_str.rfind(".")
-                    ]
-                )
-                - 1
-            )
-
-            img, mask = factorspeople.get_image(
-                data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
+            flow_idx = int(
+                first_img_str[first_img_str.rfind("/") + 1 : first_img_str.rfind(".")]
             )
 
             img2, mask2 = factorspeople.get_image(
+                data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
+            )
+
+            img, mask = factorspeople.get_image(
                 data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
             )
 
