@@ -84,4 +84,9 @@ def warp_img(im: torch.tensor, flow: np.array, device: torch.device) -> torch.te
     vgrid = vgrid.permute(0, 2, 3, 1).to(device)
     output = F.grid_sample(im, vgrid, align_corners=True)
 
+    # renormalise image
+    output += output.min()
+    output = output / output.max()
+    output *= 255.0
+
     return output.to(device)
