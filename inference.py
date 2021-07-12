@@ -173,13 +173,13 @@ if __name__ == "__main__":
                 SAVE_DIR + "/" + "nonft_" + name, nonft_out_np.astype(np.uint8),
             )
 
-            # imageio.imwrite(
-            #     SAVE_DIR + "/" + "shading_" + name, shading_np.astype(np.uint8),
-            # )
+            imageio.imwrite(
+                SAVE_DIR + "/" + "shading_" + name, shading_np.astype(np.uint8),
+            )
 
-            # imageio.imwrite(
-            #     SAVE_DIR + "/" + "albedo_" + name, albedo_np.astype(np.uint8),
-            # )
+            imageio.imwrite(
+                SAVE_DIR + "/" + "albedo_" + name, albedo_np.astype(np.uint8),
+            )
             # imsave(name, rendering.detach().cpu().numpy())
 
     if SAVE_DIR:
