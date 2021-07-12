@@ -61,8 +61,8 @@ class TikTokDataset(Dataset):
                 self.masks = []
                 self.names = []
 
-            video_imgs = sorted(glob.glob(f"{appended_path}/{folder}/images/*.png"))[1:]
-            video_masks = sorted(glob.glob(f"{appended_path}/{folder}/masks/*.png"))[1:]
+            video_imgs = sorted(glob.glob(f"{appended_path}/{folder}/images/*.png"))
+            video_masks = sorted(glob.glob(f"{appended_path}/{folder}/masks/*.png"))
 
             self.images += [
                 video_imgs[i : i + sample_size]
