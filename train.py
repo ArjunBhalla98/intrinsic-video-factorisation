@@ -126,7 +126,6 @@ if __name__ == "__main__":
         # squarize_size=1024,
     )
     train_loader = DataLoader(dataset_train, shuffle=False)
-    print(train_loader)
     print("Data Loaded")
 
     # Handle all model related stuff

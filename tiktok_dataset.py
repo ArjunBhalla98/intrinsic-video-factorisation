@@ -56,6 +56,7 @@ class TikTokDataset(Dataset):
                 self.train_images = self.images[:]
                 self.train_masks = self.masks[:]
                 self.train_names = self.names[:]
+                print(len(self.train_images))
 
                 self.images = []
                 self.masks = []
