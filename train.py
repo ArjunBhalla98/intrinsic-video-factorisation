@@ -125,7 +125,7 @@ if __name__ == "__main__":
         sample_size=BATCH_SIZE,
         # squarize_size=1024,
     )
-    train_loader = DataLoader(dataset_train, shuffle=True)
+    train_loader = DataLoader(dataset_train, shuffle=False)
     print("Data Loaded")
 
     # Handle all model related stuff
@@ -175,14 +175,10 @@ if __name__ == "__main__":
             #### PUT MODEL SPECIFIC FORWARD PASS CODE HERE ####
             #### FOR SIGGRAPH TRAINING ####
             first_img_str = data["img_paths"][-1][0]
-            flow_idx = (
-                int(
-                    first_img_str[
-                        first_img_str.rfind("/") + 1 : first_img_str.rfind(".")
-                    ]
-                )
-                - 1
+            flow_idx = int(
+                first_img_str[first_img_str.rfind("/") + 1 : first_img_str.rfind(".")]
             )
+            print(flow_idx, first_img_str)
 
             img, mask = factorspeople.get_image(
                 data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
