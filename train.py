@@ -191,7 +191,7 @@ if __name__ == "__main__":
             )
 
             img, mask = factorspeople.get_image(
-                data["img_paths"][-2][0], data["mask_paths"][-1][0]
+                data["img_paths"][-2][0], data["mask_paths"][-2][0]
             )
 
             img = img.to(device)
