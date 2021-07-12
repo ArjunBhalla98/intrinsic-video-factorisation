@@ -169,7 +169,7 @@ if __name__ == "__main__":
         running_loss = 0
 
         for i, data in tqdm(enumerate(train_loader), total=len(train_loader)):
-            if i == 0:
+            if i == 0 or i == 1:
                 continue
             torch.cuda.empty_cache()
             optimizer.zero_grad()
