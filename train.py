@@ -186,11 +186,11 @@ if __name__ == "__main__":
             )
             print(flow_idx, second_img_str, data["img_paths"][-2][0])
 
-            img, mask = factorspeople.get_image(
+            img2, mask2 = factorspeople.get_image(
                 data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
             )
 
-            img2, mask2 = factorspeople.get_image(
+            img, mask = factorspeople.get_image(
                 data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
             )
 
