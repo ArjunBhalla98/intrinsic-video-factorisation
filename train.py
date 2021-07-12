@@ -169,8 +169,6 @@ if __name__ == "__main__":
         running_loss = 0
 
         for i, data in tqdm(enumerate(train_loader), total=len(train_loader)):
-            if i == 0 or i == 1:
-                continue
             torch.cuda.empty_cache()
             optimizer.zero_grad()
             #### PUT MODEL SPECIFIC FORWARD PASS CODE HERE ####
@@ -183,7 +181,6 @@ if __name__ == "__main__":
                     ]
                 )
             ) - 1
-            print(flow_idx, first_img_str, data["img_paths"][-1][0])
 
             img2, mask2 = factorspeople.get_image(
                 data["img_paths"][-1][0], data["mask_paths"][-1][0]
@@ -192,8 +189,6 @@ if __name__ == "__main__":
             img, mask = factorspeople.get_image(
                 data["img_paths"][-2][0], data["mask_paths"][-2][0]
             )
-
-            print(img.size(), img2.size())
 
             img = img.to(device)
             mask = mask.to(device)
