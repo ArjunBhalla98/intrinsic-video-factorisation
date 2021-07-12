@@ -56,7 +56,7 @@ def optical_flow_loss(alb1, alb2, mask1, flow, device):
         f"loss_pics/alb_{i}_2nd.png",
         alb2.squeeze(0).detach().cpu().permute(1, 2, 0).numpy(),
     )
-    # i += 1
+    i += 1
     criterion = nn.MSELoss()
     loss = criterion(alb1_predicted, alb1 * mask1)
     return loss
