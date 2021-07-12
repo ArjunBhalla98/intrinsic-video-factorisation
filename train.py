@@ -175,16 +175,16 @@ if __name__ == "__main__":
             optimizer.zero_grad()
             #### PUT MODEL SPECIFIC FORWARD PASS CODE HERE ####
             #### FOR SIGGRAPH TRAINING ####
-            first_img_str = data["img_paths"][-1][0]
+            second_img_str = data["img_paths"][-1][0]
             flow_idx = (
                 int(
-                    first_img_str[
-                        first_img_str.rfind("/") + 1 : first_img_str.rfind(".")
+                    second_img_str[
+                        second_img_str.rfind("/") + 1 : second_img_str.rfind(".")
                     ]
                 )
                 - 1
             )
-            print(flow_idx, first_img_str)
+            print(flow_idx, second_img_str, data["img_paths"][-2][0])
 
             img, mask = factorspeople.get_image(
                 data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
