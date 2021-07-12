@@ -138,7 +138,7 @@ if __name__ == "__main__":
     ##### PUT TASK SPECIFIC PRE-TRAINING THINGS HERE #####
     all_dirs = get_model_dirs()
     factorspeople = FactorsPeople(all_dirs, device)
-    flows = np.load("267_flow_full.npy")
+    flows = np.load("267_flow_new.npy")
     optical_lambda = 0.1
 
     static_factor_model = FactorsPeople(all_dirs, device_2)
