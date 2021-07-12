@@ -182,16 +182,16 @@ if __name__ == "__main__":
                         first_img_str.rfind("/") + 1 : first_img_str.rfind(".")
                     ]
                 )
-                - 2
+                - 1
             )
             print(flow_idx, first_img_str, data["img_paths"][-1][0])
 
             img2, mask2 = factorspeople.get_image(
-                data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
+                data["img_paths"][-1][0], data["mask_paths"][-1][0]
             )
 
             img, mask = factorspeople.get_image(
-                data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
+                data["img_paths"][-2][0], data["mask_paths"][-1][0]
             )
 
             img = img.to(device)
