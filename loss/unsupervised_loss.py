@@ -42,7 +42,7 @@ def optical_flow_loss(alb1, alb2, mask1, flow, device):
     alb1 = alb1.to(device)
     alb2 = alb2.to(device)
     mask1 = mask1.to(device)
-    alb1_predicted = warp_img(alb2, flow, device)
+    alb1_predicted = warp_img(alb2, flow, device) * mask1
     # * mask1
     imageio.imsave(
         f"loss_pics/alb_{i}_predicted.png",

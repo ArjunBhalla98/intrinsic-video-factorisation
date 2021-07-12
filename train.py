@@ -193,6 +193,8 @@ if __name__ == "__main__":
                 data["img_paths"][-2][0], data["mask_paths"][-2][0]
             )
 
+            print(img.size(), img2.size())
+
             img = img.to(device)
             mask = mask.to(device)
 
