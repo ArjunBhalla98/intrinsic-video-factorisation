@@ -176,8 +176,13 @@ if __name__ == "__main__":
             #### PUT MODEL SPECIFIC FORWARD PASS CODE HERE ####
             #### FOR SIGGRAPH TRAINING ####
             first_img_str = data["img_paths"][-1][0]
-            flow_idx = int(
-                first_img_str[first_img_str.rfind("/") + 1 : first_img_str.rfind(".")]
+            flow_idx = (
+                int(
+                    first_img_str[
+                        first_img_str.rfind("/") + 1 : first_img_str.rfind(".")
+                    ]
+                )
+                - 1
             )
             print(flow_idx, first_img_str)
 
