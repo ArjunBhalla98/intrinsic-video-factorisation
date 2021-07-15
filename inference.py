@@ -10,6 +10,7 @@ import torchvision.transforms as transforms
 from matplotlib.pyplot import imsave
 import imageio
 from tiktok_dataset import TikTokDataset
+import torchvision
 from models.factor_people.fact_people_ops import *
 
 # To change loss or model, adjust these:
@@ -129,7 +130,8 @@ if __name__ == "__main__":
         images = images.to(device)
         masks = masks.to(device)
 
-        gt = (img.detach() * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
+        gt = img.detach() * mask.detach() * 255.0
+        gt_img = gt.squeeze().permute(1, 2, 0)
 
         nonft_reconstruction, nonft_factors = nonft_factor_model.reconstruct(img, mask)
         nonft_out = (
@@ -140,7 +142,7 @@ if __name__ == "__main__":
             # .permute(1, 2, 0)
         )
         nonft_recons_error += recons_error_criterion(
-            nonft_out.squeeze().permute(1, 2, 0), gt
+            nonft_out.squeeze().permute(1, 2, 0), gt_img
         ).item()
 
         torch.cuda.empty_cache()
@@ -153,7 +155,7 @@ if __name__ == "__main__":
             # .squeeze().permute(1, 2, 0)
         )
         ft_recons_error += recons_error_criterion(
-            out.squeeze().permute(1, 2, 0), gt
+            out.squeeze().permute(1, 2, 0), gt_img
         ).item()
 
         count += 1
@@ -179,9 +181,13 @@ if __name__ == "__main__":
             batch_out_nonft = torch.cat(
                 (nonft_out.detach(), nonft_albedo, nonft_shading, gt.detach())
             )
+            out_ft = torchvision.utils.make_grid(batch_out_ft, nrow=4)
+            out_nonft = torchvision.utils.make_grid(batch_out_nonft, nrow=4)
 
-            imageio.imwrite(f"{SAVE_DIR}/{name}", batch_out_ft)
-            imageio.imwrite(f"{SAVE_DIR}/nonft_{name}", batch_out_nonft)
+            imageio.imwrite(f"{SAVE_DIR}/{name}", out_ft.permute(1, 2, 0).cpu().numpy())
+            imageio.imwrite(
+                f"{SAVE_DIR}/nonft_{name}", out_nonft.permute(1, 2, 0).cpu().numpy()
+            )
 
             # shading_np = shading.detach().cpu().numpy()
             # albedo_np = albedo.detach().cpu().numpy()
