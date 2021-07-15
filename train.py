@@ -227,8 +227,8 @@ if __name__ == "__main__":
             static_albedo = static_albedo.to(device_2)
             albedo = albedo.to(device_2)
 
-            # shading_loss = shading_albedo_loss(static_shading, shading) * shading_lambda
-            # albedo_loss = shading_albedo_loss(static_albedo, albedo) * albedo_lambda
+            shading_loss = shading_albedo_loss(static_shading, shading) * shading_lambda
+            albedo_loss = shading_albedo_loss(static_albedo, albedo) * albedo_lambda
             ####################################################
             # add shading loss and albedo loss to this for the SIGGRAPH
             out = out.to(device_2)
@@ -236,19 +236,19 @@ if __name__ == "__main__":
             reconstruction_loss = criterion(out, gt)
             reconstruction_loss = reconstruction_loss.to(device)
             optical_loss = optical_loss.to(device)
-            # shading_loss = shading_loss.to(device)
-            # albedo_loss = albedo_loss.to(device)
-            # loss = reconstruction_loss + optical_loss + shading_loss + albedo_loss
-            loss = optical_loss + reconstruction_loss
+            shading_loss = shading_loss.to(device)
+            albedo_loss = albedo_loss.to(device)
+            loss = reconstruction_loss + optical_loss + shading_loss + albedo_loss
+            # loss = optical_loss + reconstruction_loss
             running_loss += loss.item()
             loss.backward()
             optimizer.step()
             wandb.log(
                 {
                     "loss": loss.item(),
-                    # "shading loss": shading_loss.item(),
+                    "shading loss": shading_loss.item(),
                     "reconstruction loss": reconstruction_loss.item(),
-                    # "albedo loss": albedo_loss.item(),
+                    "albedo loss": albedo_loss.item(),
                     "optical loss": optical_loss.item(),
                 }
             )
