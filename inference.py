@@ -133,54 +133,80 @@ if __name__ == "__main__":
 
         nonft_reconstruction, nonft_factors = nonft_factor_model.reconstruct(img, mask)
         nonft_out = (
-            (nonft_reconstruction.detach() * mask.detach() * 255.0)
-            .squeeze()
-            .permute(1, 2, 0)
+            nonft_reconstruction.detach()
+            * mask.detach()
+            * 255.0
+            # .squeeze()
+            # .permute(1, 2, 0)
         )
-        nonft_recons_error += recons_error_criterion(nonft_out, gt).item()
+        nonft_recons_error += recons_error_criterion(
+            nonft_out.squeeze().permute(1, 2, 0), gt
+        ).item()
 
         torch.cuda.empty_cache()
 
         reconstruction, factors = factorspeople.reconstruct(img, mask)
         out = (
-            (reconstruction.detach() * mask.detach() * 255.0).squeeze().permute(1, 2, 0)
+            reconstruction.detach()
+            * mask.detach()
+            * 255.0
+            # .squeeze().permute(1, 2, 0)
         )
-        ft_recons_error += recons_error_criterion(out, gt).item()
+        ft_recons_error += recons_error_criterion(
+            out.squeeze().permute(1, 2, 0), gt
+        ).item()
 
         count += 1
 
         if SAVE_DIR:
-            out_np = out.detach().cpu().numpy()
+            # out_np = out.detach().cpu().numpy()
             nonft_out_np = nonft_out.detach().cpu().numpy()
-            gt_np = gt.detach().cpu().numpy()
-            shading = factors["shading"].squeeze(0).permute(1, 2, 0)
+            # gt_np = gt.detach().cpu().numpy()
+            # shading = factors["shading"].squeeze(0).permute(1, 2, 0)
+            shading = factors["shading"].detach()
             shading = shading / shading.max() * 255.0
-            albedo = factors["albedo"].squeeze(0).permute(1, 2, 0)
+            # albedo = factors["albedo"].squeeze(0).permute(1, 2, 0)
+            albedo = factors["albedo"].detach()
             albedo = albedo / albedo.max() * 255.0
-            shading_np = shading.detach().cpu().numpy()
-            albedo_np = albedo.detach().cpu().numpy()
+
+            nonft_albedo = nonft_factors["albedo"].detach()
+            nonft_albedo = nonft_albedo / nonft_albedo.max() * 255.0
+
+            nonft_shading = nonft_factors["shading"].detach()
+            nonft_shading = nonft_shading / nonft_shading.max() * 255.0
+
+            batch_out_ft = torch.cat((out.detach(), albedo, shading, gt.detach()))
+            batch_out_nonft = torch.cat(
+                (nonft_out.detach(), nonft_albedo, nonft_shading, gt.detach())
+            )
+
+            imageio.imwrite(f"{SAVE_DIR}/{name}", batch_out_ft)
+            imageio.imwrite(f"{SAVE_DIR}/nonft_{name}", batch_out_nonft)
+
+            # shading_np = shading.detach().cpu().numpy()
+            # albedo_np = albedo.detach().cpu().numpy()
             # name_noext = name[: name.find(".")]
             # np.save(SAVE_DIR + "/" + name_noext + ".npy", out_np)
             # np.save(SAVE_DIR + "/gt_" + name_noext + ".npy", gt_np)
             # np.save(SAVE_DIR + "/shading_" + name_noext + ".npy", shading_np)
             # np.save(SAVE_DIR + "/albedo_" + name_noext + ".npy", albedo_np)
 
-            imageio.imwrite(
-                SAVE_DIR + "/" + name, out_np.astype(np.uint8),
-            )
+            # imageio.imwrite(
+            #     SAVE_DIR + "/" + name, out_np.astype(np.uint8),
+            # )
 
-            imageio.imwrite(
-                SAVE_DIR + "/" + "nonft_" + name, nonft_out_np.astype(np.uint8),
-            )
+            # imageio.imwrite(
+            #     SAVE_DIR + "/" + "nonft_" + name, nonft_out_np.astype(np.uint8),
+            # )
 
-            imageio.imwrite(
-                SAVE_DIR + "/" + "shading_" + name, shading_np.astype(np.uint8),
-            )
+            # imageio.imwrite(
+            #     SAVE_DIR + "/" + "shading_" + name, shading_np.astype(np.uint8),
+            # )
 
-            imageio.imwrite(
-                SAVE_DIR + "/" + "albedo_" + name, albedo_np.astype(np.uint8),
-            )
-            # imsave(name, rendering.detach().cpu().numpy())
+            # imageio.imwrite(
+            #     SAVE_DIR + "/" + "albedo_" + name, albedo_np.astype(np.uint8),
+            # )
+            # # imsave(name, rendering.detach().cpu().numpy())
 
     if SAVE_DIR:
         print(f"Eval Finished - images are in {SAVE_DIR}")
