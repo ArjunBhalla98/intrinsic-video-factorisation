@@ -173,6 +173,7 @@ if __name__ == "__main__":
         )
 
         reconstruction2, factors2 = factorspeople.reconstruct(img2, mask2)
+        reconstruction2 = reconstruction2.to(device2)
         out2 = reconstruction2.detach() * mask2.detach() * 255.0
         ft_recons_error += recons_error_criterion(
             out.squeeze().permute(1, 2, 0), gt_img
