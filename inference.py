@@ -101,6 +101,9 @@ if __name__ == "__main__":
     factorspeople.load_model_state(model_states_trained)
     factorspeople.set_eval()
 
+    factorspeople2 = FactorsPeople(all_dirs, device=device2)
+    factorspeople2.load_model_state(model_states_trained)
+    factorspeople2.set_eval()
     # nonft_factor_model = FactorsPeople(all_dirs, device=device)
     # nonft_factor_model.set_eval()
     # model.train_dropout = False  # relighting humans
@@ -128,7 +131,7 @@ if __name__ == "__main__":
         # images = data["images"].squeeze(0)
         # name = data["names"].pop()[0]
 
-        img2, mask2 = factorspeople.get_image(
+        img2, mask2 = factorspeople2.get_image(
             data["img_paths"][-1][0], data["mask_paths"][-1][0]
         )
 
@@ -143,7 +146,6 @@ if __name__ == "__main__":
         mask2 = mask2.to(device2)
         # images = images.to(device)
         # masks = masks.to(device)
-        factorspeople.to(device)
 
         gt = img.detach() * mask.detach() * 255.0
         gt_img = gt.squeeze().permute(1, 2, 0)
@@ -169,8 +171,6 @@ if __name__ == "__main__":
             * 255.0
             # .squeeze().permute(1, 2, 0)
         )
-
-        factorspeople.to(device2)
 
         reconstruction2, factors2 = factorspeople.reconstruct(img2, mask2)
         out2 = reconstruction2.detach() * mask2.detach() * 255.0
