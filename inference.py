@@ -120,6 +120,7 @@ if __name__ == "__main__":
     mean_recons_diff = 0
     count = 0
     recons_error_criterion = nn.MSELoss()
+    first_trial = True
     prev_img = None
     prev_albedo = None
     prev_shading = None
@@ -187,7 +188,7 @@ if __name__ == "__main__":
 
         reconstruction = reconstruction.to(device2)
 
-        if prev_img:
+        if not first_trial:
             mean_albedo_diff += recons_error_criterion(albedo, prev_albedo)
             mean_shading_diff += recons_error_criterion(shading, prev_shading)
             mean_recons_diff += recons_error_criterion(reconstruction, prev_img)
@@ -199,6 +200,7 @@ if __name__ == "__main__":
             prev_img = reconstruction
             prev_albedo = albedo
             prev_shading = shading
+            first_trial = False
 
         if SAVE_DIR:
             # out_np = out.detach().cpu().numpy()
