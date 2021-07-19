@@ -98,6 +98,14 @@ class FactorsPeople:
             torch.load(model_state_dict["refine_rendering_net"])
         )
 
+    def to(self, device):
+        self.self_shading_net.to(device)
+        self.shading_net.to(device)
+        self.SH_model.to(device)
+        self.albedo_net.to(device)
+        self.shadow_net.to(device)
+        self.refine_rendering_net.to(device)
+
     def get_image(self, img_path, mask_path):
         input_img_origin = np.array(Image.open(img_path).resize((278, 500)))
         input_mask_origin = np.array(Image.open(mask_path).resize((278, 500)))

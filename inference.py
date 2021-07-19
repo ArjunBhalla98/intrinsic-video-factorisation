@@ -72,6 +72,7 @@ if __name__ == "__main__":
         dev = "cpu"
 
     device = torch.device(dev)
+    device2 = torch.device("cuda:1")
 
     # Handle all data loading and related stuff
     transform = transforms.Compose([transforms.ToTensor()])
@@ -122,9 +123,10 @@ if __name__ == "__main__":
 
     print("Beginning Eval.")
     for i, data in tqdm(enumerate(test_loader), total=len(test_loader)):
-        masks = data["masks"].squeeze(0)
-        images = data["images"].squeeze(0)
-        name = data["names"].pop()[0]
+        torch.cuda.empty_cache()
+        # masks = data["masks"].squeeze(0)
+        # images = data["images"].squeeze(0)
+        # name = data["names"].pop()[0]
 
         img2, mask2 = factorspeople.get_image(
             data["img_paths"][-1][0], data["mask_paths"][-1][0]
@@ -136,10 +138,12 @@ if __name__ == "__main__":
 
         img = img.to(device)
         mask = mask.to(device)
-        img2 = img2.to(device)
-        mask2 = mask2.to(device)
-        images = images.to(device)
-        masks = masks.to(device)
+
+        img2 = img2.to(device2)
+        mask2 = mask2.to(device2)
+        # images = images.to(device)
+        # masks = masks.to(device)
+        factorspeople.to(device)
 
         gt = img.detach() * mask.detach() * 255.0
         gt_img = gt.squeeze().permute(1, 2, 0)
@@ -166,17 +170,19 @@ if __name__ == "__main__":
             # .squeeze().permute(1, 2, 0)
         )
 
+        factorspeople.to(device2)
+
         reconstruction2, factors2 = factorspeople.reconstruct(img2, mask2)
         out2 = reconstruction2.detach() * mask2.detach() * 255.0
         ft_recons_error += recons_error_criterion(
             out.squeeze().permute(1, 2, 0), gt_img
         ).item()
 
-        albedo = factors["albedo"]
-        albedo2 = factors2["albedo"]
+        albedo = factors["albedo"].to(device)
+        albedo2 = factors2["albedo"].to(device)
 
-        shading = factors["shading"]
-        shading2 = factors2["shading"]
+        shading = factors["shading"].to(device)
+        shading2 = factors2["shading"].to(device)
 
         mean_albedo_diff += recons_error_criterion(albedo, albedo2)
         mean_shading_diff += recons_error_criterion(shading, shading2)
