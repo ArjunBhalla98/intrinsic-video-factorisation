@@ -101,9 +101,6 @@ if __name__ == "__main__":
     factorspeople.load_model_state(model_states_trained)
     factorspeople.set_eval()
 
-    factorspeople2 = FactorsPeople(all_dirs, device=device2)
-    factorspeople2.load_model_state(model_states_trained)
-    factorspeople2.set_eval()
     # nonft_factor_model = FactorsPeople(all_dirs, device=device)
     # nonft_factor_model.set_eval()
     # model.train_dropout = False  # relighting humans
@@ -123,6 +120,9 @@ if __name__ == "__main__":
     mean_recons_diff = 0
     count = 0
     recons_error_criterion = nn.MSELoss()
+    prev_img = None
+    prev_albedo = None
+    prev_shading = None
 
     print("Beginning Eval.")
     for i, data in tqdm(enumerate(test_loader), total=len(test_loader)):
@@ -131,9 +131,9 @@ if __name__ == "__main__":
         # images = data["images"].squeeze(0)
         # name = data["names"].pop()[0]
 
-        img2, mask2 = factorspeople2.get_image(
-            data["img_paths"][-1][0], data["mask_paths"][-1][0]
-        )
+        # img2, mask2 = factorspeople2.get_image(
+        #     data["img_paths"][-1][0], data["mask_paths"][-1][0]
+        # )
 
         img, mask = factorspeople.get_image(
             data["img_paths"][-2][0], data["mask_paths"][-2][0]
@@ -142,8 +142,8 @@ if __name__ == "__main__":
         img = img.to(device)
         mask = mask.to(device)
 
-        img2 = img2.to(device2)
-        mask2 = mask2.to(device2)
+        # img2 = img2.to(device2)
+        # mask2 = mask2.to(device2)
         # images = images.to(device)
         # masks = masks.to(device)
 
@@ -172,26 +172,33 @@ if __name__ == "__main__":
             # .squeeze().permute(1, 2, 0)
         )
 
-        reconstruction2, factors2 = factorspeople.reconstruct(img2, mask2)
-        reconstruction2 = reconstruction2.to(device2)
-        out2 = reconstruction2.detach() * mask2.detach() * 255.0
+        # reconstruction2, factors2 = factorspeople.reconstruct(img2, mask2)
+        # reconstruction2 = reconstruction2.to(device2)
+        # out2 = reconstruction2.detach() * mask2.detach() * 255.0
         ft_recons_error += recons_error_criterion(
             out.squeeze().permute(1, 2, 0), gt_img
         ).item()
 
         albedo = factors["albedo"].to(device)
-        albedo2 = factors2["albedo"].to(device)
+        # albedo2 = factors2["albedo"].to(device)
 
         shading = factors["shading"].to(device)
-        shading2 = factors2["shading"].to(device)
+        # shading2 = factors2["shading"].to(device)
 
         reconstruction = reconstruction.to(device2)
 
-        mean_albedo_diff += recons_error_criterion(albedo, albedo2)
-        mean_shading_diff += recons_error_criterion(shading, shading2)
-        mean_recons_diff += recons_error_criterion(reconstruction, reconstruction2)
-
-        count += 1
+        if prev_img:
+            mean_albedo_diff += recons_error_criterion(albedo, prev_albedo)
+            mean_shading_diff += recons_error_criterion(shading, prev_shading)
+            mean_recons_diff += recons_error_criterion(reconstruction, prev_img)
+            prev_img = reconstruction
+            prev_albedo = albedo
+            prev_shading = shading
+            count += 1
+        else:
+            prev_img = reconstruction
+            prev_albedo = albedo
+            prev_shading = shading
 
         if SAVE_DIR:
             # out_np = out.detach().cpu().numpy()
