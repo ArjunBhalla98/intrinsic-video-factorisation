@@ -130,7 +130,7 @@ if __name__ == "__main__":
         torch.cuda.empty_cache()
         # masks = data["masks"].squeeze(0)
         # images = data["images"].squeeze(0)
-        # name = data["names"].pop()[0]
+        name = data["names"].pop()[0]
 
         # img2, mask2 = factorspeople2.get_image(
         #     data["img_paths"][-1][0], data["mask_paths"][-1][0]
