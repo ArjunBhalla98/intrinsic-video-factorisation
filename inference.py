@@ -54,7 +54,7 @@ parser.add_argument(
     default="opt_loss_reg_",
 )
 
-parser.add_argument("--batch_size")
+parser.add_argument("--batch_size", type=int)
 
 args = parser.parse_args()
 ROOT_DIR = args.root_dir
