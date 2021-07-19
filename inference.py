@@ -98,7 +98,7 @@ if __name__ == "__main__":
     }
     all_dirs = get_model_dirs()
     factorspeople = FactorsPeople(all_dirs, device=device)
-    # factorspeople.load_model_state(model_states_trained)
+    factorspeople.load_model_state(model_states_trained)
     factorspeople.set_eval()
 
     # nonft_factor_model = FactorsPeople(all_dirs, device=device)

@@ -88,15 +88,42 @@ class FactorsPeople:
 
     def load_model_state(self, model_state_dict):
         self.self_shading_net.load_state_dict(
-            torch.load(model_state_dict["self_shading_net"])
+            torch.load(
+                model_state_dict["self_shading_net"],
+                map_location=lambda storage, loc: storage,
+            )
         )
-        self.shading_net.load_state_dict(torch.load(model_state_dict["shading_net"]))
-        self.SH_model.load_state_dict(torch.load(model_state_dict["SH_model"]))
-        self.albedo_net.load_state_dict(torch.load(model_state_dict["albedo_net"]))
-        self.shadow_net.load_state_dict(torch.load(model_state_dict["shadow_net"]))
+        self.shading_net.load_state_dict(
+            torch.load(
+                model_state_dict["shading_net"],
+                map_location=lambda storage, loc: storage,
+            )
+        )
+        self.SH_model.load_state_dict(
+            torch.load(
+                model_state_dict["SH_model"], map_location=lambda storage, loc: storage
+            )
+        )
+        self.albedo_net.load_state_dict(
+            torch.load(
+                model_state_dict["albedo_net"],
+                map_location=lambda storage, loc: storage,
+            )
+        )
+        self.shadow_net.load_state_dict(
+            torch.load(
+                model_state_dict["shadow_net"],
+                map_location=lambda storage, loc: storage,
+            )
+        )
         self.refine_rendering_net.load_state_dict(
-            torch.load(model_state_dict["refine_rendering_net"])
+            torch.load(
+                model_state_dict["refine_rendering_net"],
+                map_location=lambda storage, loc: storage,
+            )
         )
+        del model_state_dict
+        torch.cuda.empty_cache()
 
     def to(self, device):
         self.self_shading_net.to(device)
