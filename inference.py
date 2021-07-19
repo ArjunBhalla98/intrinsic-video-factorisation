@@ -185,6 +185,8 @@ if __name__ == "__main__":
         shading = factors["shading"].to(device)
         shading2 = factors2["shading"].to(device)
 
+        reconstruction = reconstruction.to(device2)
+
         mean_albedo_diff += recons_error_criterion(albedo, albedo2)
         mean_shading_diff += recons_error_criterion(shading, shading2)
         mean_recons_diff += recons_error_criterion(reconstruction, reconstruction2)
