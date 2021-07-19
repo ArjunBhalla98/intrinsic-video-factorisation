@@ -54,13 +54,15 @@ parser.add_argument(
     default="opt_loss_reg_",
 )
 
+parser.add_argument("--batch_size")
+
 args = parser.parse_args()
 ROOT_DIR = args.root_dir
 CUDA_DEV = args.dev
 LOAD_PATH = args.load_state
 SAVE_DIR = args.save_dir
 LOG = args.log
-BATCH_SIZE = 1
+BATCH_SIZE = args.batch_size
 LOAD_PREFIX = args.load_prefix
 
 if __name__ == "__main__":
