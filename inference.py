@@ -100,8 +100,8 @@ if __name__ == "__main__":
     factorspeople.load_model_state(model_states_trained)
     factorspeople.set_eval()
 
-    nonft_factor_model = FactorsPeople(all_dirs, device=device)
-    nonft_factor_model.set_eval()
+    # nonft_factor_model = FactorsPeople(all_dirs, device=device)
+    # nonft_factor_model.set_eval()
     # model.train_dropout = False  # relighting humans
 
     if LOAD_PATH:
@@ -144,17 +144,17 @@ if __name__ == "__main__":
         gt = img.detach() * mask.detach() * 255.0
         gt_img = gt.squeeze().permute(1, 2, 0)
 
-        nonft_reconstruction, nonft_factors = nonft_factor_model.reconstruct(img, mask)
-        nonft_out = (
-            nonft_reconstruction.detach()
-            * mask.detach()
-            * 255.0
-            # .squeeze()
-            # .permute(1, 2, 0)
-        )
-        nonft_recons_error += recons_error_criterion(
-            nonft_out.squeeze().permute(1, 2, 0), gt_img
-        ).item()
+        # nonft_reconstruction, nonft_factors = nonft_factor_model.reconstruct(img, mask)
+        # nonft_out = (
+        #     nonft_reconstruction.detach()
+        #     * mask.detach()
+        #     * 255.0
+        #     # .squeeze()
+        #     # .permute(1, 2, 0)
+        # )
+        # nonft_recons_error += recons_error_criterion(
+        #     nonft_out.squeeze().permute(1, 2, 0), gt_img
+        # ).item()
 
         torch.cuda.empty_cache()
 
@@ -186,7 +186,7 @@ if __name__ == "__main__":
 
         if SAVE_DIR:
             # out_np = out.detach().cpu().numpy()
-            nonft_out_np = nonft_out.detach().cpu().numpy()
+            # nonft_out_np = nonft_out.detach().cpu().numpy()
             # gt_np = gt.detach().cpu().numpy()
             # shading = factors["shading"].squeeze(0).permute(1, 2, 0)
             shading = factors["shading"].detach()
@@ -195,23 +195,23 @@ if __name__ == "__main__":
             albedo = factors["albedo"].detach()
             albedo = albedo / albedo.max() * 255.0
 
-            nonft_albedo = nonft_factors["albedo"].detach()
-            nonft_albedo = nonft_albedo / nonft_albedo.max() * 255.0
+            # nonft_albedo = nonft_factors["albedo"].detach()
+            # nonft_albedo = nonft_albedo / nonft_albedo.max() * 255.0
 
-            nonft_shading = nonft_factors["shading"].detach()
-            nonft_shading = nonft_shading / nonft_shading.max() * 255.0
+            # nonft_shading = nonft_factors["shading"].detach()
+            # nonft_shading = nonft_shading / nonft_shading.max() * 255.0
 
             batch_out_ft = torch.cat((out.detach(), albedo, shading, gt.detach()))
-            batch_out_nonft = torch.cat(
-                (nonft_out.detach(), nonft_albedo, nonft_shading, gt.detach())
-            )
+            # batch_out_nonft = torch.cat(
+            #     (nonft_out.detach(), nonft_albedo, nonft_shading, gt.detach())
+            # )
             out_ft = torchvision.utils.make_grid(batch_out_ft, nrow=4)
-            out_nonft = torchvision.utils.make_grid(batch_out_nonft, nrow=4)
+            # out_nonft = torchvision.utils.make_grid(batch_out_nonft, nrow=4)
 
             imageio.imwrite(f"{SAVE_DIR}/{name}", out_ft.permute(1, 2, 0).cpu().numpy())
-            imageio.imwrite(
-                f"{SAVE_DIR}/nonft_{name}", out_nonft.permute(1, 2, 0).cpu().numpy()
-            )
+            # imageio.imwrite(
+            #     f"{SAVE_DIR}/nonft_{name}", out_nonft.permute(1, 2, 0).cpu().numpy()
+            # )
 
             # shading_np = shading.detach().cpu().numpy()
             # albedo_np = albedo.detach().cpu().numpy()
@@ -249,6 +249,6 @@ if __name__ == "__main__":
     print(
         f"Average Validation Set Reconstruction Error, Fine Tuned: {ft_recons_error / count}"
     )
-    print(
-        f"Average Validation Set Reconstruction Error, NON Fine Tuned: {nonft_recons_error / count}"
-    )
+    # print(
+    #     f"Average Validation Set Reconstruction Error, NON Fine Tuned: {nonft_recons_error / count}"
+    # )
