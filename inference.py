@@ -112,6 +112,9 @@ if __name__ == "__main__":
 
     nonft_recons_error = 0
     ft_recons_error = 0
+    mean_albedo_diff = 0
+    mean_shading_diff = 0
+    mean_recons_diff = 0
     count = 0
     recons_error_criterion = nn.MSELoss()
 
@@ -121,12 +124,18 @@ if __name__ == "__main__":
         images = data["images"].squeeze(0)
         name = data["names"].pop()[0]
 
+        img2, mask2 = factorspeople.get_image(
+            data["img_paths"][-1][0], data["mask_paths"][-1][0]
+        )
+
         img, mask = factorspeople.get_image(
-            data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
+            data["img_paths"][-2][0], data["mask_paths"][-2][0]
         )
 
         img = img.to(device)
         mask = mask.to(device)
+        img2 = img2.to(device)
+        mask2 = mask2.to(device)
         images = images.to(device)
         masks = masks.to(device)
 
@@ -154,9 +163,22 @@ if __name__ == "__main__":
             * 255.0
             # .squeeze().permute(1, 2, 0)
         )
+
+        reconstruction2, factors2 = factorspeople.reconstruct(img2, mask2)
+        out2 = reconstruction2.detach() * mask2.detach() * 255.0
         ft_recons_error += recons_error_criterion(
             out.squeeze().permute(1, 2, 0), gt_img
         ).item()
+
+        albedo = factors["albedo"]
+        albedo2 = factors2["albedo"]
+
+        shading = factors["shading"]
+        shading2 = factors2["shading"]
+
+        mean_albedo_diff += recons_error_criterion(albedo, albedo2)
+        mean_shading_diff += recons_error_criterion(shading, shading2)
+        mean_recons_diff += recons_error_criterion(reconstruction, reconstruction2)
 
         count += 1
 
@@ -219,6 +241,9 @@ if __name__ == "__main__":
     else:
         print("Eval Finished")
 
+    print(f"Average reconstruction consistency: {mean_recons_diff / count}")
+    print(f"Average Albedo consistency: {mean_albedo_diff / count}")
+    print(f"Average Shading consistency: {mean_shading_diff / count}")
     print(
         f"Average Validation Set Reconstruction Error, Fine Tuned: {ft_recons_error / count}"
     )
