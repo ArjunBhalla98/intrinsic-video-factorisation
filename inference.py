@@ -98,7 +98,7 @@ if __name__ == "__main__":
     }
     all_dirs = get_model_dirs()
     factorspeople = FactorsPeople(all_dirs, device=device)
-    factorspeople.load_model_state(model_states_trained)
+    # factorspeople.load_model_state(model_states_trained)
     factorspeople.set_eval()
 
     # nonft_factor_model = FactorsPeople(all_dirs, device=device)
@@ -186,12 +186,10 @@ if __name__ == "__main__":
         shading = factors["shading"].to(device)
         # shading2 = factors2["shading"].to(device)
 
-        reconstruction = reconstruction.to(device2)
-
         if not first_trial:
-            mean_albedo_diff += recons_error_criterion(albedo, prev_albedo)
-            mean_shading_diff += recons_error_criterion(shading, prev_shading)
-            mean_recons_diff += recons_error_criterion(reconstruction, prev_img)
+            mean_albedo_diff += recons_error_criterion(albedo, prev_albedo).item()
+            mean_shading_diff += recons_error_criterion(shading, prev_shading).item()
+            mean_recons_diff += recons_error_criterion(reconstruction, prev_img).item()
             prev_img = reconstruction
             prev_albedo = albedo
             prev_shading = shading
