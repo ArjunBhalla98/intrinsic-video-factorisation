@@ -138,7 +138,9 @@ if __name__ == "__main__":
     ##### PUT TASK SPECIFIC PRE-TRAINING THINGS HERE #####
     all_dirs = get_model_dirs()
     factorspeople = FactorsPeople(all_dirs, device)
-    flows = np.load("267_flow_new.npy")
+    flow_267 = np.load("267_flow_full.npy")
+    flow_301 = np.load("301_flow_full.npy")
+    flow_305 = np.load("305_flow_full.npy")
     optical_lambda = 0.1
 
     static_factor_model = FactorsPeople(all_dirs, device_2)
@@ -181,6 +183,13 @@ if __name__ == "__main__":
                     ]
                 )
             ) - 1
+
+            if "00267" in first_img_str:
+                flows = flow_267
+            elif "00301" in first_img_str:
+                flows = flow_301
+            else:
+                flows = flow_305
 
             img2, mask2 = factorspeople.get_image(
                 data["img_paths"][-1][0], data["mask_paths"][-1][0]
@@ -233,12 +242,12 @@ if __name__ == "__main__":
             # add shading loss and albedo loss to this for the SIGGRAPH
             out = out.to(device_2)
             gt = gt.to(device_2)
-            reconstruction_loss = criterion(out, gt)
-            reconstruction_loss = reconstruction_loss.to(device)
+            # reconstruction_loss = criterion(out, gt)
+            # reconstruction_loss = reconstruction_loss.to(device)
             optical_loss = optical_loss.to(device)
             shading_loss = shading_loss.to(device)
             # albedo_loss = albedo_loss.to(device)
-            loss = reconstruction_loss + optical_loss + shading_loss
+            loss = optical_loss + shading_loss
             # loss = optical_loss + reconstruction_loss + albedo_loss
             running_loss += loss.item()
             loss.backward()
@@ -247,7 +256,7 @@ if __name__ == "__main__":
                 {
                     "loss": loss.item(),
                     "shading loss": shading_loss.item(),
-                    "reconstruction loss": reconstruction_loss.item(),
+                    # "reconstruction loss": reconstruction_loss.item(),
                     # "albedo loss": albedo_loss.item(),
                     "optical loss": optical_loss.item(),
                 }
