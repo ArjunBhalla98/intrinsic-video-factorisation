@@ -228,8 +228,10 @@ if __name__ == "__main__":
 
             # out_nonft = torchvision.utils.make_grid(batch_out_nonft, nrow=4)
 
+            print(light.size())
             imageio.imwrite(
-                f"{SAVE_DIR}/light_{name}", light.permute(1, 2, 0).cpu().numpy()
+                f"{SAVE_DIR}/light_{name}",
+                light.unsqueeze(0).permute(1, 2, 0).cpu().numpy(),
             )
             imageio.imwrite(f"{SAVE_DIR}/{name}", out_ft.permute(1, 2, 0).cpu().numpy())
             # imageio.imwrite(
