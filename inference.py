@@ -212,6 +212,7 @@ if __name__ == "__main__":
             albedo = albedo / albedo.max() * 255.0
 
             light = factors["light"].detach()
+            light = light - light.min()
             light = light / light.max() * 255.0
 
             # nonft_albedo = nonft_factors["albedo"].detach()
