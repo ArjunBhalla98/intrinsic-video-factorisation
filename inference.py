@@ -211,6 +211,9 @@ if __name__ == "__main__":
             albedo = factors["albedo"].detach()
             albedo = albedo / albedo.max() * 255.0
 
+            light = factors["light"].detach()
+            light = light / light.max() * 255.0
+
             # nonft_albedo = nonft_factors["albedo"].detach()
             # nonft_albedo = nonft_albedo / nonft_albedo.max() * 255.0
 
@@ -222,8 +225,12 @@ if __name__ == "__main__":
             #     (nonft_out.detach(), nonft_albedo, nonft_shading, gt.detach())
             # )
             out_ft = torchvision.utils.make_grid(batch_out_ft, nrow=4)
+
             # out_nonft = torchvision.utils.make_grid(batch_out_nonft, nrow=4)
 
+            imageio.imwrite(
+                f"{SAVE_DIR}/light_{name}", light.permute(1, 2, 0).cpu().numpy()
+            )
             imageio.imwrite(f"{SAVE_DIR}/{name}", out_ft.permute(1, 2, 0).cpu().numpy())
             # imageio.imwrite(
             #     f"{SAVE_DIR}/nonft_{name}", out_nonft.permute(1, 2, 0).cpu().numpy()
