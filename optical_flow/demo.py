@@ -10,6 +10,7 @@ import numpy as np
 import torch
 from PIL import Image
 from collections import defaultdict
+import pickle
 
 from raft import RAFT
 from utils import flow_viz
@@ -21,6 +22,8 @@ if torch.cuda.is_available():
     DEVICE = "cuda"
 else:
     DEVICE = "cpu"
+
+DEVICE = torch.device(DEVICE)
 import os
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
@@ -53,48 +56,46 @@ def viz(img, flo):
 
 def demo(args):
     model = torch.nn.DataParallel(RAFT(args))
-    model.load_state_dict(torch.load(args.model, map_location=torch.device("cpu")))
+    model.load_state_dict(torch.load(args.model))
 
     model = model.module
     model.to(DEVICE)
     model.eval()
 
     with torch.no_grad():
-        images = glob.glob(os.path.join(args.path, "*.png")) + glob.glob(
-            os.path.join(args.path, "*.jpg")
-        )
+        final_dict = {}
+        for i, folder in enumerate(sorted(os.listdir(args.path))):
+            images = glob.glob(
+                os.path.join(args.path + folder + "/images/", "*.png")
+            ) + glob.glob(os.path.join(args.path + folder + "/images/", "*.jpg"))
 
-        fact_people = FactorsPeople(torch.device("cpu"))
+            fact_people = FactorsPeople(DEVICE)
 
-        ret = []
-        is_ret = False
-        images = sorted(images)
-        mask_tmp_pth = "00267_train_masks/0001.png"
-        for imfile1, imfile2 in zip(images[:-1], images[1:]):
-            # image1 = load_image(imfile1)
-            # image2 = load_image(imfile2)
+            ret = []
+            is_ret = False
+            images = sorted(images)
+            mask_tmp_pth = "/phoenix/S3/ab2383/data/TikTok_dataset/00267/masks/0001.png"
+            for imfile1, imfile2 in zip(images[:-1], images[1:]):
+                image1, _ = fact_people.get_image(imfile1, mask_tmp_pth)
+                image2, _ = fact_people.get_image(imfile2, mask_tmp_pth)
 
-            # image1, _, _ = ResizeImage(image1, mask_tmp_pth)
-            # image2, _, _ = ResizeImage(image2, mask_tmp_pth)
+                image1 *= 255.0
+                image2 *= 255.0
 
-            # image1 = torch.from_numpy(image1).unsqueeze(0)
-            # image2 = torch.from_numpy(image2).unsqueeze(0)
-            image1, _ = fact_people.get_image(imfile1, mask_tmp_pth)
-            image2, _ = fact_people.get_image(imfile2, mask_tmp_pth)
+                _, flow_up = model(image1, image2, iters=20, test_mode=True)
+                if not is_ret:
+                    is_ret = True
+                    ret = flow_up
+                else:
+                    ret = torch.cat((ret, flow_up), 0)
+            final_dict[i + 1] = ret.detach().cpu().numpy()
 
-            image1 *= 255.0
-            image2 *= 255.0
-            print(image1.max(), image2.max(), image1.min(), image2.min())
-
-            _, flow_up = model(image1, image2, iters=20, test_mode=True)
-            if not is_ret:
-                is_ret = True
-                ret = flow_up
-            else:
-                ret = torch.cat((ret, flow_up), 0)
-            # viz(image1, flow_up)
-
-        np.save("267_flow_new.npy", ret.detach().cpu().numpy())
+        with open("/phoenix/S3/ab2383/data/hundred_hundreds.pickle", "wb") as f:
+            pickle.dump(
+                final_dict,
+                f,
+                protocol=pickle.HIGHEST_PROTOCOL,
+            )
 
 
 if __name__ == "__main__":
