@@ -174,7 +174,7 @@ if __name__ == "__main__":
             #### FOR SIGGRAPH TRAINING ####
             first_img_str = data["img_paths"][-2][0]
             end_portion = first_img_str.find("/images")
-            video_id = first_img_str[end_portion - 5 : end_portion]
+            video_id = int(first_img_str[end_portion - 5 : end_portion])
             flow_idx = (
                 int(
                     first_img_str[
