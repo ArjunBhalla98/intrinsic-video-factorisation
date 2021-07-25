@@ -138,9 +138,6 @@ if __name__ == "__main__":
     ##### PUT TASK SPECIFIC PRE-TRAINING THINGS HERE #####
     all_dirs = get_model_dirs()
     factorspeople = FactorsPeople(all_dirs, device)
-    flow_267 = np.load("267_flow_full.npy")
-    flow_301 = np.load("301_flow_full.npy")
-    flow_305 = np.load("305_flow_full.npy")
     optical_lambda = 0.1
 
     static_factor_model = FactorsPeople(all_dirs, device_2)
@@ -176,6 +173,8 @@ if __name__ == "__main__":
             #### PUT MODEL SPECIFIC FORWARD PASS CODE HERE ####
             #### FOR SIGGRAPH TRAINING ####
             first_img_str = data["img_paths"][-2][0]
+            end_portion = first_img_str.find("/images")
+            video_id = first_img_str[end_portion - 5 : end_portion]
             flow_idx = (
                 int(
                     first_img_str[
@@ -184,12 +183,10 @@ if __name__ == "__main__":
                 )
             ) - 1
 
-            if "00267" in first_img_str:
-                flows = flow_267
-            elif "00301" in first_img_str:
-                flows = flow_301
-            else:
-                flows = flow_305
+            if flow_idx > 99 or int(video_id) > 100:
+                continue
+
+            flows = np.load(f"/phoenix/S3/ab2383/data/flows/{video_id}.npy")
 
             img2, mask2 = factorspeople.get_image(
                 data["img_paths"][-1][0], data["mask_paths"][-1][0]

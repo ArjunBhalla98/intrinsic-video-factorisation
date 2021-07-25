@@ -45,7 +45,7 @@ class TikTokDataset(Dataset):
         self.smaller_width = 278
         self.smaller_height = 500
 
-        video_dirs = sorted(os.listdir(appended_path))[:40]
+        video_dirs = sorted(os.listdir(appended_path))[:100]
         TRAIN_TEST_SPLIT = round(0.8 * len(video_dirs))
 
         for i, folder in enumerate(video_dirs):
