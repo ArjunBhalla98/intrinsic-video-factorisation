@@ -91,7 +91,9 @@ def demo(args):
                     ret = flow_up
                 else:
                     ret = torch.cat((ret, flow_up), 0)
-            np.save(f"{i+1}.npy", ret.detach().cpu().numpy())
+            np.save(
+                f"/phoenix/S3/ab2383/data/flows/{i+1}.npy", ret.detach().cpu().numpy()
+            )
             if i == 99:
                 break
 
