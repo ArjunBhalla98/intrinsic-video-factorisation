@@ -75,7 +75,11 @@ def demo(args):
             is_ret = False
             images = sorted(images)[:100]
             mask_tmp_pth = "/phoenix/S3/ab2383/data/TikTok_dataset/00267/masks/0001.png"
+            count = 0
             for imfile1, imfile2 in zip(images[:-1], images[1:]):
+                if count >= 100:
+                    print("count >= 100")
+                    break
                 image1, _ = fact_people.get_image(imfile1, mask_tmp_pth)
                 image2, _ = fact_people.get_image(imfile2, mask_tmp_pth)
 
@@ -91,6 +95,8 @@ def demo(args):
                     ret = flow_up
                 else:
                     ret = torch.cat((ret, flow_up), 0)
+                count += 1
+
             np.save(
                 f"/phoenix/S3/ab2383/data/flows/{i+1}.npy", ret.detach().cpu().numpy()
             )
