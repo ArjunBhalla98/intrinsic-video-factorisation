@@ -77,7 +77,7 @@ if __name__ == "__main__":
     # Handle all data loading and related stuff
     transform = transforms.Compose([transforms.ToTensor()])
     dataset_test = TikTokDataset(
-        ROOT_DIR, device, train=True, transform=transform, sample_size=BATCH_SIZE,
+        ROOT_DIR, device, train=False, transform=transform, sample_size=BATCH_SIZE,
     )
     test_loader = DataLoader(dataset_test, shuffle=False)
     print("Data Loaded")
