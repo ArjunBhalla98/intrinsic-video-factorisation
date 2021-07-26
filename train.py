@@ -3,6 +3,7 @@ import torch
 import wandb
 import torch.nn as nn
 from torch.autograd import Variable
+import imageio
 import argparse
 import numpy as np
 from tqdm import tqdm
@@ -114,7 +115,7 @@ if __name__ == "__main__":
         dev = "cpu"
 
     device = torch.device(dev)
-
+    device_2 = torch.device("cuda:1")
     # Handle all data loading and related stuff
     transform = transforms.Compose([transforms.ToTensor()])
     dataset_train = TikTokDataset(
@@ -124,7 +125,7 @@ if __name__ == "__main__":
         sample_size=BATCH_SIZE,
         # squarize_size=1024,
     )
-    train_loader = DataLoader(dataset_train, shuffle=True)
+    train_loader = DataLoader(dataset_train, shuffle=False)
     print("Data Loaded")
 
     # Handle all model related stuff
@@ -137,19 +138,9 @@ if __name__ == "__main__":
     ##### PUT TASK SPECIFIC PRE-TRAINING THINGS HERE #####
     all_dirs = get_model_dirs()
     factorspeople = FactorsPeople(all_dirs, device)
-    raft = RAFT(args)
-    raft = torch.nn.DataParallel(RAFT(args))
-    # if RAFT_PATH:
-    # raft.load_state_dict(torch.load(RAFT_PATH, map_location=device))
-    # raft_dev = torch.device("cpu")
-    flows = np.load("267_flow_full.npy")
-
-    # raft = raft.module
-    # raft.to(raft_dev)
-    # raft.eval()
     optical_lambda = 0.1
 
-    static_factor_model = FactorsPeople(all_dirs, device)
+    static_factor_model = FactorsPeople(all_dirs, device_2)
     static_factor_model.set_eval()
     shading_albedo_loss = nn.MSELoss()
     shading_lambda = 0.1
@@ -177,37 +168,45 @@ if __name__ == "__main__":
         running_loss = 0
 
         for i, data in tqdm(enumerate(train_loader), total=len(train_loader)):
-            # masks = data["masks"].squeeze(0)
-            # images = data["images"].squeeze(0)
-
-            # images = images.to(device)
-            # masks = masks.to(device)
-
             torch.cuda.empty_cache()
             optimizer.zero_grad()
             #### PUT MODEL SPECIFIC FORWARD PASS CODE HERE ####
             #### FOR SIGGRAPH TRAINING ####
-            first_img_str = data["img_paths"][-1][0]
-            flow_idx = int(
-                first_img_str[first_img_str.rfind("/") + 1 : first_img_str.rfind(".")]
+            first_img_str = data["img_paths"][-2][0]
+            end_portion = first_img_str.find("/images")
+            video_id = int(first_img_str[end_portion - 5 : end_portion])
+            flow_idx = (
+                int(
+                    first_img_str[
+                        first_img_str.rfind("/") + 1 : first_img_str.rfind(".")
+                    ]
+                )
+            ) - 1
+
+            if flow_idx > 99 or int(video_id) > 100:
+                continue
+
+            flows = np.load(f"/phoenix/S3/ab2383/data/flows/{video_id}.npy")
+
+            img2, mask2 = factorspeople.get_image(
+                data["img_paths"][-1][0], data["mask_paths"][-1][0]
             )
 
             img, mask = factorspeople.get_image(
-                data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
+                data["img_paths"][-2][0], data["mask_paths"][-2][0]
             )
 
-            img2, mask2 = factorspeople.get_image(
-                data["img_paths"].pop()[0], data["mask_paths"].pop()[0]
-            )
+            img = img.to(device)
+            mask = mask.to(device)
 
-            # img = img.to(device)
-            # mask = mask.to(device)
-
-            # img2 = img2.to(device)
-            # mask2 = mask2.to(device)
+            img2 = img2.to(device_2)
+            mask2 = mask2.to(device_2)
 
             gt = img.detach() * mask.detach()
             out, factors = factorspeople.reconstruct(img, mask)
+
+            img = img.to(device_2)
+            mask = mask.to(device_2)
             _, static_factors = static_factor_model.reconstruct(img, mask)
             _, static_factors_2 = static_factor_model.reconstruct(img2, mask2)
             static_shading = static_factors["shading"]
@@ -229,12 +228,24 @@ if __name__ == "__main__":
                 )
                 * optical_lambda
             )
+            static_shading = static_shading.to(device_2)
+            shading = shading.to(device_2)
+            static_albedo = static_albedo.to(device_2)
+            albedo = albedo.to(device_2)
+
             shading_loss = shading_albedo_loss(static_shading, shading) * shading_lambda
-            albedo_loss = shading_albedo_loss(static_albedo, albedo) * albedo_lambda
+            # albedo_loss = shading_albedo_loss(static_albedo, albedo) * albedo_lambda
             ####################################################
             # add shading loss and albedo loss to this for the SIGGRAPH
-            reconstruction_loss = criterion(out, gt)
-            loss = reconstruction_loss + optical_loss + shading_loss + albedo_loss
+            out = out.to(device_2)
+            gt = gt.to(device_2)
+            # reconstruction_loss = criterion(out, gt)
+            # reconstruction_loss = reconstruction_loss.to(device)
+            optical_loss = optical_loss.to(device)
+            shading_loss = shading_loss.to(device)
+            # albedo_loss = albedo_loss.to(device)
+            loss = optical_loss + shading_loss
+            # loss = optical_loss + reconstruction_loss + albedo_loss
             running_loss += loss.item()
             loss.backward()
             optimizer.step()
@@ -242,7 +253,8 @@ if __name__ == "__main__":
                 {
                     "loss": loss.item(),
                     "shading loss": shading_loss.item(),
-                    "albedo loss": albedo_loss.item(),
+                    # "reconstruction loss": reconstruction_loss.item(),
+                    # "albedo loss": albedo_loss.item(),
                     "optical loss": optical_loss.item(),
                 }
             )

@@ -3,11 +3,14 @@ import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
+import imageio
 
 """
 This file contains all loss functions that are "unsupervised" - i.e., they will take in only one tensor ideally,
 which should be a tensor containing n image samples. See specific examples and docstrings.
 """
+
+i = 1
 
 
 def l1_loss(results):
@@ -35,7 +38,13 @@ def optical_flow_loss(alb1, alb2, mask1, flow, device):
     from the second image to find the corresponding RGB values in the first. Since
     it is albedo this should ideally have 0 MSE loss
     """
+    global i
+    alb1 = alb1.to(device)
+    alb2 = alb2.to(device)
+    mask1 = mask1.to(device)
     alb1_predicted = warp_img(alb2, flow, device) * mask1
+    # * mask1
+    i += 1
     criterion = nn.MSELoss()
     loss = criterion(alb1_predicted, alb1 * mask1)
     return loss
@@ -44,7 +53,7 @@ def optical_flow_loss(alb1, alb2, mask1, flow, device):
 def warp_img(im: torch.tensor, flow: np.array, device: torch.device) -> torch.tensor:
     """
     Warps image im according to the flow. n.b. im should be 1xCxHxW, flow should
-    be 2xCxHxW
+    be Bx2xHxW
     """
     im = im.to(device)
     B, C, H, W = im.shape
@@ -61,7 +70,7 @@ def warp_img(im: torch.tensor, flow: np.array, device: torch.device) -> torch.te
     vgrid[:, 0, :, :] = 2.0 * vgrid[:, 0, :, :].clone() / max(W - 1, 1) - 1.0
     vgrid[:, 1, :, :] = 2.0 * vgrid[:, 1, :, :].clone() / max(H - 1, 1) - 1.0
 
-    vgrid = vgrid.permute(0, 2, 3, 1)
+    vgrid = vgrid.permute(0, 2, 3, 1).to(device)
     output = F.grid_sample(im, vgrid, align_corners=True)
 
     return output.to(device)

@@ -422,7 +422,7 @@ coord_tensor = torch.FloatTensor(coord_tensor).cuda()
 
 
 class LightNet_Hybrid(nn.Module):
-    def __init__(self, num_group=1, input_channel=4):
+    def __init__(self, num_group=1, input_channel=4, device=torch.device("cuda:0")):
         super(LightNet_Hybrid, self).__init__()
 
         self.human_conv1 = nn.Sequential(
@@ -549,9 +549,13 @@ class LightNet_Hybrid(nn.Module):
         self.avgpooling = nn.AdaptiveAvgPool2d((4, 6))
         self.maxpooling = nn.AdaptiveMaxPool2d((1, 1))
 
+        self.device = device
+
     def getEnvLightConf(self, shlight):
         light = shlight.reshape(shlight.shape[0], 3, 9, 1, 1)
-        envlight = torch.sum(light * env_transport_tensor, dim=2)
+        light = light.to(self.device)
+        en = env_transport_tensor.to(self.device)
+        envlight = torch.sum(light * en, dim=2)
 
         Intensity = torch.sum(torch.clamp(envlight, 0.0, float("inf")), dim=1).reshape(
             envlight.shape[0], -1

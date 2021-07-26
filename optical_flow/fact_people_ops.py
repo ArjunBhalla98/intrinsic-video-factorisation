@@ -1,82 +1,66 @@
-from os import device_encoding
 import torch
 import numpy as np
 from PIL import Image
-import torch.nn as nn
 
-import models.factor_people.networks.network_light as network_light
-import models.factor_people.networks.network as network
-import models.factor_people.networks.BilateralLayer as BlLayer
-import models.factor_people.networks.testTools as testTools
+from testTools import *
+
+# import models.factor_people.networks.network_light as network_light
+# import models.factor_people.networks.network as network
+# import models.factor_people.networks.BilateralLayer as BlLayer
+# import models.factor_people.networks.as testTools
 
 
 # define a class that takes input image and return factors and a reconstruction or relighting, or insertion
 class FactorsPeople:
     # load models
-    def __init__(self, all_dirs, device=torch.device("cuda:0")):
+    def __init__(self, device=torch.device("cuda")):
         super(FactorsPeople, self).__init__()
 
-        self_shading_net_path = all_dirs["self_shading_net"]
-        shading_net_path = all_dirs["shading_net"]
-        SH_model_path = all_dirs["SH_model"]
-        albedo_net_path = all_dirs["albedo_net"]
-        shadow_net_path = all_dirs["shadow_net"]
-        refine_rendering_net_path = all_dirs["refine_rendering_net"]
+        # self_shading_net_path = all_dirs["self_shading_net"]
+        # shading_net_path = all_dirs["shading_net"]
+        # SH_model_path = all_dirs["SH_model"]
+        # albedo_net_path = all_dirs["albedo_net"]
+        # shadow_net_path = all_dirs["shadow_net"]
+        # refine_rendering_net_path = all_dirs["refine_rendering_net"]
 
-        self.device = device
+        # # load models
+        # self.albedo_net = network.Unet_Blurpooling_General(input_channel=7)
+        # self.albedo_net = self.albedo_net.to(device)
+        # checkpoint = torch.load(albedo_net_path)
+        # self.albedo_net.load_state_dict(checkpoint["model"])
+        # self.albedo_net.cuda_kernels()
 
-        # load models
-        self.albedo_net = network.Unet_Blurpooling_General(
-            input_channel=7, device=device
-        )
-        # self.albedo_net = nn.DataParallel(self.albedo_net, device_ids=[0, 1])
-        self.albedo_net = self.albedo_net.to(device)
-        checkpoint = torch.load(albedo_net_path)
-        self.albedo_net.load_state_dict(checkpoint["model"])
-        self.albedo_net.cuda_kernels()
+        # self.SH_model = network_light.LightNet_Hybrid(16, input_channel=4)
+        # self.SH_model = self.SH_model.to(device)
+        # checkpoint = torch.load(SH_model_path)
+        # self.SH_model.load_state_dict(checkpoint["model"])
 
-        self.SH_model = network_light.LightNet_Hybrid(
-            16, input_channel=4, device=device
-        )
-        # self.SH_model = nn.DataParallel(self.SH_model, device_ids=[0, 1])
-        self.SH_model = self.SH_model.to(device)
-        checkpoint = torch.load(SH_model_path)
-        self.SH_model.load_state_dict(checkpoint["model"])
+        # self.shading_net = network.Unet_Blurpooling_General_Light()
+        # self.shading_net = self.shading_net.to(device)
+        # checkpoint = torch.load(shading_net_path)
+        # self.shading_net.load_state_dict(checkpoint["model"])
+        # self.shading_net.cuda_kernels()
 
-        self.shading_net = network.Unet_Blurpooling_General_Light(device=device)
-        # self.shading_net = nn.DataParallel(self.shading_net, device_ids=[0, 1])
-        self.shading_net = self.shading_net.to(device)
-        checkpoint = torch.load(shading_net_path)
-        self.shading_net.load_state_dict(checkpoint["model"])
-        self.shading_net.cuda_kernels()
+        # self.self_shading_net = network.SepNetComplete_Shading(f_channel=16)
+        # self.self_shading_net = self.self_shading_net.to(device)
+        # checkpoint = torch.load(self_shading_net_path)
+        # self.self_shading_net.load_state_dict(checkpoint["model"])
 
-        self.self_shading_net = network.SepNetComplete_Shading(f_channel=16)
-        # self.self_shading_net = nn.DataParallel(
-        #     self.self_shading_net, device_ids=[0, 1]
+        # self.shadow_net = network.Unet_Blurpooling_Shadow()
+        # self.shadow_net = self.shadow_net.to(device)
+        # checkpoint = torch.load(shadow_net_path)
+        # self.shadow_net.load_state_dict(checkpoint["model"])
+        # self.shadow_net.cuda_kernels()
+
+        # self.refine_rendering_net = network.Unet_Blurpooling_General_Light(
+        #     input_channel=6
         # )
-        self.self_shading_net = self.self_shading_net.to(device)
-        checkpoint = torch.load(self_shading_net_path)
-        self.self_shading_net.load_state_dict(checkpoint["model"])
+        # self.refine_rendering_net = self.refine_rendering_net.to(device)
+        # checkpoint = torch.load(refine_rendering_net_path)
+        # self.refine_rendering_net.load_state_dict(checkpoint["model"])
+        # self.refine_rendering_net.cuda_kernels()
 
-        self.shadow_net = network.Unet_Blurpooling_Shadow(device=device)
-        # self.shadow_net = nn.DataParallel(self.shadow_net, device_ids=[0, 1])
-        self.shadow_net = self.shadow_net.to(device)
-        checkpoint = torch.load(shadow_net_path)
-        self.shadow_net.load_state_dict(checkpoint["model"])
-        self.shadow_net.cuda_kernels()
-
-        self.refine_rendering_net = network.Unet_Blurpooling_General_Light(
-            input_channel=6
-        )
-        # self.refine_rendering_net = nn.DataParallel(
-        #     self.refine_rendering_net, device_ids=[0, 1]
-        # )
-        self.refine_rendering_net = self.refine_rendering_net.to(device)
-        checkpoint = torch.load(refine_rendering_net_path)
-        self.refine_rendering_net.load_state_dict(checkpoint["model"])
-        self.refine_rendering_net.cuda_kernels()
-
-        self.refine_net = BlLayer.BilateralSolver()
+        # self.refine_net = BlLayer.BilateralSolver()
 
     def set_eval(self):
         self.albedo_net.eval()
@@ -88,50 +72,15 @@ class FactorsPeople:
 
     def load_model_state(self, model_state_dict):
         self.self_shading_net.load_state_dict(
-            torch.load(
-                model_state_dict["self_shading_net"],
-                map_location=lambda storage, loc: storage,
-            )
+            torch.load(model_state_dict["self_shading_net"])
         )
-        self.shading_net.load_state_dict(
-            torch.load(
-                model_state_dict["shading_net"],
-                map_location=lambda storage, loc: storage,
-            )
-        )
-        self.SH_model.load_state_dict(
-            torch.load(
-                model_state_dict["SH_model"], map_location=lambda storage, loc: storage
-            )
-        )
-        self.albedo_net.load_state_dict(
-            torch.load(
-                model_state_dict["albedo_net"],
-                map_location=lambda storage, loc: storage,
-            )
-        )
-        self.shadow_net.load_state_dict(
-            torch.load(
-                model_state_dict["shadow_net"],
-                map_location=lambda storage, loc: storage,
-            )
-        )
+        self.shading_net.load_state_dict(torch.load(model_state_dict["shading_net"]))
+        self.SH_model.load_state_dict(torch.load(model_state_dict["SH_model"]))
+        self.albedo_net.load_state_dict(torch.load(model_state_dict["albedo_net"]))
+        self.shadow_net.load_state_dict(torch.load(model_state_dict["shadow_net"]))
         self.refine_rendering_net.load_state_dict(
-            torch.load(
-                model_state_dict["refine_rendering_net"],
-                map_location=lambda storage, loc: storage,
-            )
+            torch.load(model_state_dict["refine_rendering_net"])
         )
-        del model_state_dict
-        torch.cuda.empty_cache()
-
-    def to(self, device):
-        self.self_shading_net.to(device)
-        self.shading_net.to(device)
-        self.SH_model.to(device)
-        self.albedo_net.to(device)
-        self.shadow_net.to(device)
-        self.refine_rendering_net.to(device)
 
     def get_image(self, img_path, mask_path):
         input_img_origin = np.array(Image.open(img_path).resize((278, 500)))
@@ -142,7 +91,7 @@ class FactorsPeople:
         if len(input_mask_origin.shape) > 2:
             input_mask_origin = input_mask_origin[:, :, 0]
 
-        input_img, input_mask, _ = testTools.ResizeImage(
+        input_img, input_mask, _ = ResizeImage(
             input_img_origin, input_mask_origin, None
         )
         input_mask = np.expand_dims(input_mask, axis=2)
@@ -177,11 +126,8 @@ class FactorsPeople:
             _,
             _,
         ) = self.SH_model(image, mask, None, None)
-        est_ground = est_ground.to(self.device)
-        est_sun_map = est_sun_map.to(self.device)
-        est_sun_intensity = est_sun_intensity.to(self.device)
 
-        est_light = testTools.recoveryEnvLight(
+        est_light = recoveryEnvLight(
             est_ground, torch.exp(est_sun_map), est_sun_intensity
         )
 
@@ -237,10 +183,8 @@ class FactorsPeople:
         }
 
     def reconstruct(self, image, mask):
-        image = image.to(self.device)
-        mask = mask.to(self.device)
         factors = self.factor(image, mask)
-        reconstruct = testTools.composition(
+        reconstruct = composition(
             factors["albedo"], factors["shading"], mask, image, factors["shadow"]
         )
         return reconstruct, factors
@@ -256,7 +200,7 @@ class FactorsPeople:
         )
         est_target_shadow = self.get_shadow(source_image, source_mask, est_target_light)
 
-        relighted = testTools.composition(
+        relighted = composition(
             est_source_albedo,
             est_target_shading,
             source_mask,
@@ -279,7 +223,7 @@ class FactorsPeople:
         )
         est_target_shadow = self.get_shadow(source_image, source_mask, target_light)
 
-        relighted = testTools.composition(
+        relighted = composition(
             est_source_albedo,
             est_target_shading,
             source_mask,
