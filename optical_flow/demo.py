@@ -69,19 +69,26 @@ def demo(args):
                 os.path.join(args.path + folder + "/images/", "*.png")
             ) + glob.glob(os.path.join(args.path + folder + "/images/", "*.jpg"))
 
+            masks = glob.glob(
+                os.path.join(args.path + folder + "/masks/", "*.png")
+            ) + glob.glob(os.path.join(args.path + folder + "/masks/", "*.jpg"))
+
             fact_people = FactorsPeople(DEVICE)
 
             ret = []
             is_ret = False
             images = sorted(images)[:100]
-            mask_tmp_pth = "/phoenix/S3/ab2383/data/TikTok_dataset/00267/masks/0001.png"
+            masks = sorted(masks)[:100]
             count = 0
-            for imfile1, imfile2 in zip(images[:-1], images[1:]):
+            for i, imfiles in enumerate(zip(images[:-1], images[1:])):
                 if count >= 100:
                     print("count >= 100")
                     break
-                image1, _ = fact_people.get_image(imfile1, mask_tmp_pth)
-                image2, _ = fact_people.get_image(imfile2, mask_tmp_pth)
+                imfile1 = imfiles[0]
+                imfile2 = imfiles[1]
+
+                image1, _ = fact_people.get_image(imfile1, masks[i])
+                image2, _ = fact_people.get_image(imfile2, masks[i + 1])
 
                 image1 = image1.to(DEVICE)
                 image2 = image2.to(DEVICE)
