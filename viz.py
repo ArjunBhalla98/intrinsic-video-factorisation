@@ -18,10 +18,10 @@ if __name__ == "__main__":
     all_dirs = get_model_dirs()
     fp = FactorsPeople(all_dirs, dev)
 
-    img = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/images/0001.png"
-    img2 = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/images/0002.png"
-    mask = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/masks/0001.png"
-    mask2 = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/masks/0002.png"
+    img = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/images/0004.png"
+    img2 = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/images/0005.png"
+    mask = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/masks/0004.png"
+    mask2 = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/masks/0005.png"
 
     img, mask = fp.get_image(img, mask)
     img2, mask2 = fp.get_image(img2, mask2)
@@ -39,7 +39,7 @@ if __name__ == "__main__":
         masked_img.detach().squeeze(0).permute(1, 2, 0).cpu().numpy() * 255.0,
     )
 
-    flow = np.load("/phoenix/S3/ab2383/data/flows/1.npy")
+    flow = np.load("/phoenix/S3/ab2383/data/flows/4.npy")
     flow = flow[0]
     plt.subplot(121)
     plt.imshow(flow[0])
