@@ -19,9 +19,15 @@ if __name__ == "__main__":
     mask = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/masks/0001.png"
 
     img, mask = fp.get_image(img, mask)
+    masked_img = img * mask
     imageio.imsave(
         "viz/get_image_viz.png",
         img.detach().squeeze(0).permute(1, 2, 0).cpu().numpy() * 255.0,
+    )
+
+    imageio.imsave(
+        "viz/masked_img.png",
+        masked_img.detach().squeeze(0).permute(1, 2, 0).cpu().numpy() * 255.0,
     )
 
     flow = np.load("/phoenix/S3/ab2383/data/flows/1.npy")
