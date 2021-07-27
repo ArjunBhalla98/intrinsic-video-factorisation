@@ -19,10 +19,11 @@ if __name__ == "__main__":
 
     img, mask = fp.get_image(img, mask)
     imageio.imsave(
-        "get_image_viz.png", img.detach().squeeze(0).permute(1, 2, 0).cpu().numpy()
+        "viz/get_image_viz.png",
+        img.detach().squeeze(0).permute(1, 2, 0).cpu().numpy() * 255.0,
     )
 
     flow = np.load("/phoenix/S3/ab2383/data/flows/1.npy")
     flow = flow[0]
-    imageio.imsave("flow_x.png", flow[0])
-    imageio.imsave("flow_y.png", flow[1])
+    imageio.imsave("viz/flow_x.png", flow[0])
+    imageio.imsave("viz/flow_y.png", flow[1])
