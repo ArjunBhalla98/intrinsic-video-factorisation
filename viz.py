@@ -6,6 +6,7 @@ from models.factor_people.fact_people_ops import *
 import matplotlib.pyplot as plt
 import torch.nn.functional as F
 import imageio
+from loss.unsupervised_loss import warp_img
 
 
 if __name__ == "__main__":
@@ -47,20 +48,7 @@ if __name__ == "__main__":
     plt.imshow(flow[1])
     plt.savefig("viz/flow.png")
 
-    B, C, H, W = img.shape
-    xx = torch.arange(0, W).view(1, -1).repeat(H, 1)
-    yy = torch.arange(0, H).view(-1, 1).repeat(1, W)
-    xx = xx.view(1, 1, H, W).repeat(B, 1, 1, 1)
-    yy = yy.view(1, 1, H, W).repeat(B, 1, 1, 1)
-    grid = torch.cat((xx, yy), 1).float()
-
-    # update flow and normalise to range [-1,1]
-    vgrid = Variable(grid) + flow
-    vgrid[:, 0, :, :] = 2.0 * vgrid[:, 0, :, :].clone() / max(W - 1, 1) - 1.0
-    vgrid[:, 1, :, :] = 2.0 * vgrid[:, 1, :, :].clone() / max(H - 1, 1) - 1.0
-
-    vgrid = vgrid.permute(0, 2, 3, 1)
-    output = F.grid_sample(torch.FloatTensor(img2), vgrid, align_corners=True)
+    output = warp_img(img2, np.expand_dims(flow, 0), dev)
 
     imageio.imsave(
         "viz/warped_img.png", output.detach().squeeze(0).permute(1, 2, 0).cpu().numpy()
