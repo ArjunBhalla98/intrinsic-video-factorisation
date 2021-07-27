@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 from models.factor_people.fact_people_ops import *
+import matplotlib.pyplot as plt
 import imageio
 
 
@@ -25,5 +26,10 @@ if __name__ == "__main__":
 
     flow = np.load("/phoenix/S3/ab2383/data/flows/1.npy")
     flow = flow[0]
-    imageio.imsave("viz/flow_x.png", flow[0])
-    imageio.imsave("viz/flow_y.png", flow[1])
+    plt.subplot(121)
+    plt.imshow(flow[0])
+    plt.subplot(122)
+    plt.imshow(flow[1])
+    plt.savefig("viz/flow.png")
+#     imageio.imsave("viz/flow_x.png", flow[0])
+#     imageio.imsave("viz/flow_y.png", flow[1])
