@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from .models.factor_people.fact_people_ops import *
+from models.factor_people.fact_people_ops import *
 import imageio
 
 
