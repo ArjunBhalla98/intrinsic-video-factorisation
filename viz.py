@@ -42,6 +42,11 @@ if __name__ == "__main__":
 
     flow = np.load("/phoenix/S3/ab2383/data/flows/4.npy")
     flow = flow[0]
+    imageio.imsave("flowx.png", flow[0])
+    imageio.imsave("flowy.png", flow[1])
+    flowx = fp.get_image("flowx.png", mask).squeeze(0)
+    flowy = fp.get_image("flowy.png", mask).squeeze(0)
+    flow = torch.cat((flowx, flowy), 0)
     plt.subplot(121)
     plt.imshow(flow[0])
     plt.subplot(122)
