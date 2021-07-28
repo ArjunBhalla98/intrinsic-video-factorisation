@@ -44,9 +44,9 @@ if __name__ == "__main__":
     flow = flow[0]
     old_flow_max = np.max(flow)
     old_flow_min = np.min(flow)
+    flow_old = flow[:]
     flow -= old_flow_min
     flow /= old_flow_max
-    flow_old = flow[:]
     imageio.imsave("flowx.png", np.expand_dims(flow[0], 2))
     imageio.imsave("flowy.png", np.expand_dims(flow[1], 2))
     flowx, _ = fp.get_image("flowx.png", mask2_path)
