@@ -42,8 +42,8 @@ if __name__ == "__main__":
 
     flow = np.load("/phoenix/S3/ab2383/data/flows/1.npy")
     flow = flow[0]
-    imageio.imsave("flowx.png", flow[0])
-    imageio.imsave("flowy.png", flow[1])
+    imageio.imsave("flowx.png", np.expand_dims(flow[0], 2))
+    imageio.imsave("flowy.png", np.expand_dims(flow[1], 2))
     flowx = fp.get_image("flowx.png", mask_path).squeeze(0)
     flowy = fp.get_image("flowy.png", mask_path).squeeze(0)
     flow = torch.cat((flowx, flowy), 0)
