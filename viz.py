@@ -57,7 +57,10 @@ if __name__ == "__main__":
 
     print(flow.size(), img2.size())
     output = warp_img(img2, np.expand_dims(flow, 0), dev)
-    print(((output - img2) ** 2).mean(), ((output - img) ** 2).mean())
+    print(
+        ((output.cpu() - img2.cpu()) ** 2).mean(),
+        ((output.cpu() - img.cpu()) ** 2).mean(),
+    )
 
     imageio.imsave(
         "viz/warped_img.png", output.detach().squeeze(0).permute(1, 2, 0).cpu().numpy()
