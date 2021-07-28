@@ -20,9 +20,9 @@ if __name__ == "__main__":
     fp = FactorsPeople(all_dirs, dev)
 
     img_path = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/images/0001.png"
-    img2_path = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/images/0004.png"
+    img2_path = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/images/0002.png"
     mask_path = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/masks/0001.png"
-    mask2_path = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/masks/0004.png"
+    mask2_path = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/masks/0002.png"
 
     img, mask = fp.get_image(img_path, mask_path)
     img2, mask2 = fp.get_image(img2_path, mask2_path)
