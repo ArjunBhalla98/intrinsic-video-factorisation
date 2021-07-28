@@ -50,6 +50,7 @@ if __name__ == "__main__":
     flowx = flowx.squeeze(0).mean(0, keepdim=True)
     flowy = flowy.squeeze(0).mean(0, keepdim=True)
     flow = torch.cat((flowx, flowy), 0)
+    print(np.min(flow_old), np.max(flow_old), flow.min(), flow.max())
     print((flow.detach().cpu().numpy() - flow_old).sum())
     plt.subplot(121)
     plt.imshow(flow[0])
