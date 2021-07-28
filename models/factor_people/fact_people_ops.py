@@ -142,6 +142,8 @@ class FactorsPeople:
         if len(input_mask_origin.shape) > 2:
             input_mask_origin = input_mask_origin[:, :, 0]
 
+        if len(input_img_origin.shape) == 2:
+            input_img_origin = np.expand_dims(input_img_origin, 2)
         input_img, input_mask, _ = testTools.ResizeImage(
             input_img_origin, input_mask_origin, None
         )
