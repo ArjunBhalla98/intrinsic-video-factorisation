@@ -19,10 +19,10 @@ if __name__ == "__main__":
     all_dirs = get_model_dirs()
     fp = FactorsPeople(all_dirs, dev)
 
-    img_path = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/images/0001.png"
-    img2_path = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/images/0002.png"
-    mask_path = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/masks/0001.png"
-    mask2_path = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/masks/0002.png"
+    img_path = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/images/0004.png"
+    img2_path = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/images/0005.png"
+    mask_path = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/masks/0004.png"
+    mask2_path = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/masks/0005.png"
 
     img, mask = fp.get_image(img_path, mask_path)
     img2, mask2 = fp.get_image(img2_path, mask2_path)
@@ -40,7 +40,7 @@ if __name__ == "__main__":
         masked_img.detach().squeeze(0).permute(1, 2, 0).cpu().numpy() * 255.0,
     )
 
-    flow = np.load("/phoenix/S3/ab2383/data/flows/1.npy")
+    flow = np.load("/phoenix/S3/ab2383/data/flows/4.npy")
     flow = flow[0]
     imageio.imsave("flowx.png", np.expand_dims(flow[0], 2))
     imageio.imsave("flowy.png", np.expand_dims(flow[1], 2))
