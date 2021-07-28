@@ -55,6 +55,7 @@ if __name__ == "__main__":
     plt.imshow(flow[1])
     plt.savefig("viz/flow.png")
 
+    print(flow.size(), img2.size())
     output = warp_img(img2, np.expand_dims(flow, 0), dev)
 
     imageio.imsave(
