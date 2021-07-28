@@ -56,7 +56,14 @@ if __name__ == "__main__":
     flow = torch.cat((flowx, flowy), 0)
     flow *= old_flow_max
     flow += old_flow_min
-    print(np.min(flow_old), np.max(flow_old), flow.min(), flow.max())
+    print(
+        np.min(flow_old),
+        np.max(flow_old),
+        flow.min(),
+        flow.max(),
+        old_flow_min,
+        old_flow_max,
+    )
     plt.subplot(121)
     plt.imshow(flow[0])
     plt.subplot(122)
