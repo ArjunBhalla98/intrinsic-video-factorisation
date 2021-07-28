@@ -19,13 +19,13 @@ if __name__ == "__main__":
     all_dirs = get_model_dirs()
     fp = FactorsPeople(all_dirs, dev)
 
-    img = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/images/0001.png"
-    img2 = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/images/0002.png"
-    mask = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/masks/0001.png"
-    mask2 = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/masks/0002.png"
+    img_path = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/images/0001.png"
+    img2_path = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/images/0002.png"
+    mask_path = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/masks/0001.png"
+    mask2_path = "/phoenix/S3/ab2383/data/TikTok_dataset/00001/masks/0002.png"
 
-    img, mask = fp.get_image(img, mask)
-    img2, mask2 = fp.get_image(img2, mask2)
+    img, mask = fp.get_image(img_path, mask_path)
+    img2, mask2 = fp.get_image(img2_path, mask2_path)
     masked_img = img * mask
     imageio.imsave(
         "viz/img_original.png",
@@ -44,8 +44,8 @@ if __name__ == "__main__":
     flow = flow[0]
     imageio.imsave("flowx.png", flow[0])
     imageio.imsave("flowy.png", flow[1])
-    flowx = fp.get_image("flowx.png", mask).squeeze(0)
-    flowy = fp.get_image("flowy.png", mask).squeeze(0)
+    flowx = fp.get_image("flowx.png", mask_path).squeeze(0)
+    flowy = fp.get_image("flowy.png", mask_path).squeeze(0)
     flow = torch.cat((flowx, flowy), 0)
     plt.subplot(121)
     plt.imshow(flow[0])
