@@ -41,13 +41,13 @@ if __name__ == "__main__":
     )
 
     flow = np.load("/phoenix/S3/ab2383/data/flows/1.npy")
-    flow = flow[0]
+    flow = flow[1]
     imageio.imsave("flowx.png", np.expand_dims(flow[0], 2))
     imageio.imsave("flowy.png", np.expand_dims(flow[1], 2))
     flowx, _ = fp.get_image("flowx.png", mask2_path)
     flowy, _ = fp.get_image("flowy.png", mask2_path)
-    flowx = -flowx.squeeze(0).mean(0, keepdim=True)
-    flowy = -flowy.squeeze(0).mean(0, keepdim=True)
+    flowx = flowx.squeeze(0).mean(0, keepdim=True)
+    flowy = flowy.squeeze(0).mean(0, keepdim=True)
     flow = torch.cat((flowx, flowy), 0)
     plt.subplot(121)
     plt.imshow(flow[0])
