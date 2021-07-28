@@ -47,13 +47,14 @@ if __name__ == "__main__":
     flow_old = np.copy(flow)
     flow -= old_flow_min
     flow /= old_flow_max
+    flow *= 255
     imageio.imsave("flowx.png", np.expand_dims(flow[0], 2))
     imageio.imsave("flowy.png", np.expand_dims(flow[1], 2))
     flowx, _ = fp.get_image("flowx.png", mask_path)
     flowy, _ = fp.get_image("flowy.png", mask_path)
     flowx = flowx.squeeze(0).mean(0, keepdim=True)
     flowy = flowy.squeeze(0).mean(0, keepdim=True)
-    flow = torch.cat((flowx, flowy), 0)
+    flow = torch.cat((flowx, flowy), 0) / 255
     flow *= old_flow_max
     flow += old_flow_min
     print(np.min(flow_old), np.max(flow_old), flow.min(), flow.max())
