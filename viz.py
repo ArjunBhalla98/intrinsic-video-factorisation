@@ -44,20 +44,19 @@ if __name__ == "__main__":
     flow = flow[0]
     old_flow_max = np.max(flow)
     old_flow_min = np.min(flow)
-    flow_old = flow[:]
+    flow_old = np.copy(flow)
     flow -= old_flow_min
     flow /= old_flow_max
     imageio.imsave("flowx.png", np.expand_dims(flow[0], 2))
     imageio.imsave("flowy.png", np.expand_dims(flow[1], 2))
-    flowx, _ = fp.get_image("flowx.png", mask2_path)
-    flowy, _ = fp.get_image("flowy.png", mask2_path)
+    flowx, _ = fp.get_image("flowx.png", mask_path)
+    flowy, _ = fp.get_image("flowy.png", mask_path)
     flowx = flowx.squeeze(0).mean(0, keepdim=True)
     flowy = flowy.squeeze(0).mean(0, keepdim=True)
     flow = torch.cat((flowx, flowy), 0)
     flow *= old_flow_max
     flow += old_flow_min
     print(np.min(flow_old), np.max(flow_old), flow.min(), flow.max())
-    print((flow.detach().cpu().numpy() - flow_old).sum())
     plt.subplot(121)
     plt.imshow(flow[0])
     plt.subplot(122)
