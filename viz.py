@@ -50,8 +50,8 @@ if __name__ == "__main__":
     imageio.imsave("flowy.png", np.repeat(np.expand_dims(flow[1], 2), 3, axis=2))
     flowx, _ = fp.get_image("flowx.png", mask_path)
     flowy, _ = fp.get_image("flowy.png", mask_path)
-    flowx = flowx.squeeze(0).mean(0)
-    flowy = flowy.squeeze(0).mean(0)
+    flowx = flowx.squeeze(0).mean(0, keepdim=True)
+    flowy = flowy.squeeze(0).mean(0, keepdim=True)
     flow = torch.cat((flowx, flowy), 0)
     flow *= old_flow_max
     flow += old_flow_min
