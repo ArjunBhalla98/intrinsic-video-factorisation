@@ -172,112 +172,115 @@ if __name__ == "__main__":
             optimizer.zero_grad()
             #### PUT MODEL SPECIFIC FORWARD PASS CODE HERE ####
             #### FOR SIGGRAPH TRAINING ####
-            first_img_str = data["img_paths"][-2][0]
-            end_portion = first_img_str.find("/images")
-            video_id = int(first_img_str[end_portion - 5 : end_portion])
-            flow_idx = (
-                int(
-                    first_img_str[
-                        first_img_str.rfind("/") + 1 : first_img_str.rfind(".")
-                    ]
+            try:
+                first_img_str = data["img_paths"][-2][0]
+                end_portion = first_img_str.find("/images")
+                video_id = int(first_img_str[end_portion - 5 : end_portion])
+                flow_idx = (
+                    int(
+                        first_img_str[
+                            first_img_str.rfind("/") + 1 : first_img_str.rfind(".")
+                        ]
+                    )
+                ) - 1
+
+                if flow_idx > 99 or int(video_id) > 100:
+                    continue
+
+                mask_path = data["mask_paths"][-2][0]
+                flows = np.load(f"/phoenix/S3/ab2383/data/flows/{video_id}.npy")
+                flow = flows[flow_idx]
+
+                old_flow_min = np.min(flow)
+                flow -= old_flow_min
+                old_flow_max = np.max(flow)
+                flow /= old_flow_max
+                imageio.imsave(
+                    "flowx.png",
+                    np.repeat(np.expand_dims(flow[0], 2), 3, axis=2).astype(np.uint8),
                 )
-            ) - 1
+                imageio.imsave(
+                    "flowy.png",
+                    np.repeat(np.expand_dims(flow[1], 2), 3, axis=2).astype(np.uint8),
+                )
+                flowx, _ = factorspeople.get_image("flowx.png", mask_path)
+                flowy, _ = factorspeople.get_image("flowy.png", mask_path)
+                flowx = flowx.squeeze(0).mean(0, keepdim=True)
+                flowy = flowy.squeeze(0).mean(0, keepdim=True)
+                flow = torch.cat((flowx, flowy), 0)
+                flow *= old_flow_max
+                flow += old_flow_min
 
-            if flow_idx > 99 or int(video_id) > 100:
+                img2, mask2 = factorspeople.get_image(
+                    data["img_paths"][-1][0], data["mask_paths"][-1][0]
+                )
+
+                img, mask = factorspeople.get_image(
+                    data["img_paths"][-2][0], data["mask_paths"][-2][0]
+                )
+
+                img = img.to(device)
+                mask = mask.to(device)
+
+                img2 = img2.to(device_2)
+                mask2 = mask2.to(device_2)
+
+                gt = img.detach() * mask.detach()
+                out, factors = factorspeople.reconstruct(img, mask)
+
+                img = img.to(device_2)
+                mask = mask.to(device_2)
+                _, static_factors = static_factor_model.reconstruct(img, mask)
+                _, static_factors_2 = static_factor_model.reconstruct(img2, mask2)
+                static_shading = static_factors["shading"]
+                static_shading = static_shading / static_shading.max() * 255.0
+                static_albedo = static_factors["albedo"]
+                static_albedo = static_albedo / static_albedo.max() * 255.0
+                static_albedo_2 = static_factors_2["albedo"]
+                static_albedo_2 = static_albedo_2 / static_albedo_2.max() * 255.0
+
+                shading = factors["shading"]
+                shading = shading / shading.max() * 255.0
+
+                albedo = factors["albedo"]
+                albedo = albedo / albedo.max() * 255.0
+
+                optical_loss = (
+                    optical_flow_loss(albedo, static_albedo_2, mask, flow, device)
+                    * optical_lambda
+                )
+                static_shading = static_shading.to(device_2)
+                shading = shading.to(device_2)
+                static_albedo = static_albedo.to(device_2)
+                albedo = albedo.to(device_2)
+
+                shading_loss = shading_albedo_loss(static_shading, shading) * shading_lambda
+                # albedo_loss = shading_albedo_loss(static_albedo, albedo) * albedo_lambda
+                ####################################################
+                # add shading loss and albedo loss to this for the SIGGRAPH
+                out = out.to(device_2)
+                gt = gt.to(device_2)
+                # reconstruction_loss = criterion(out, gt)
+                # reconstruction_loss = reconstruction_loss.to(device)
+                optical_loss = optical_loss.to(device)
+                shading_loss = shading_loss.to(device)
+                # albedo_loss = albedo_loss.to(device)
+                loss = optical_loss + shading_loss
+                # loss = optical_loss + reconstruction_loss + albedo_loss
+                running_loss += loss.item()
+                loss.backward()
+                optimizer.step()
+                wandb.log(
+                    {
+                        "loss": loss.item(),
+                        "shading loss": shading_loss.item(),
+                        # "reconstruction loss": reconstruction_loss.item(),
+                        # "albedo loss": albedo_loss.item(),
+                        "optical loss": optical_loss.item(),
+                    }
+                )
+            except:
                 continue
-
-            mask_path = data["mask_paths"][-2][0]
-            flows = np.load(f"/phoenix/S3/ab2383/data/flows/{video_id}.npy")
-            flow = flows[flow_idx]
-
-            old_flow_min = np.min(flow)
-            flow -= old_flow_min
-            old_flow_max = np.max(flow)
-            flow /= old_flow_max
-            imageio.imsave(
-                "flowx.png",
-                np.repeat(np.expand_dims(flow[0], 2), 3, axis=2).astype(np.uint8),
-            )
-            imageio.imsave(
-                "flowy.png",
-                np.repeat(np.expand_dims(flow[1], 2), 3, axis=2).astype(np.uint8),
-            )
-            flowx, _ = factorspeople.get_image("flowx.png", mask_path)
-            flowy, _ = factorspeople.get_image("flowy.png", mask_path)
-            flowx = flowx.squeeze(0).mean(0, keepdim=True)
-            flowy = flowy.squeeze(0).mean(0, keepdim=True)
-            flow = torch.cat((flowx, flowy), 0)
-            flow *= old_flow_max
-            flow += old_flow_min
-
-            img2, mask2 = factorspeople.get_image(
-                data["img_paths"][-1][0], data["mask_paths"][-1][0]
-            )
-
-            img, mask = factorspeople.get_image(
-                data["img_paths"][-2][0], data["mask_paths"][-2][0]
-            )
-
-            img = img.to(device)
-            mask = mask.to(device)
-
-            img2 = img2.to(device_2)
-            mask2 = mask2.to(device_2)
-
-            gt = img.detach() * mask.detach()
-            out, factors = factorspeople.reconstruct(img, mask)
-
-            img = img.to(device_2)
-            mask = mask.to(device_2)
-            _, static_factors = static_factor_model.reconstruct(img, mask)
-            _, static_factors_2 = static_factor_model.reconstruct(img2, mask2)
-            static_shading = static_factors["shading"]
-            static_shading = static_shading / static_shading.max() * 255.0
-            static_albedo = static_factors["albedo"]
-            static_albedo = static_albedo / static_albedo.max() * 255.0
-            static_albedo_2 = static_factors_2["albedo"]
-            static_albedo_2 = static_albedo_2 / static_albedo_2.max() * 255.0
-
-            shading = factors["shading"]
-            shading = shading / shading.max() * 255.0
-
-            albedo = factors["albedo"]
-            albedo = albedo / albedo.max() * 255.0
-
-            optical_loss = (
-                optical_flow_loss(albedo, static_albedo_2, mask, flow, device)
-                * optical_lambda
-            )
-            static_shading = static_shading.to(device_2)
-            shading = shading.to(device_2)
-            static_albedo = static_albedo.to(device_2)
-            albedo = albedo.to(device_2)
-
-            shading_loss = shading_albedo_loss(static_shading, shading) * shading_lambda
-            # albedo_loss = shading_albedo_loss(static_albedo, albedo) * albedo_lambda
-            ####################################################
-            # add shading loss and albedo loss to this for the SIGGRAPH
-            out = out.to(device_2)
-            gt = gt.to(device_2)
-            # reconstruction_loss = criterion(out, gt)
-            # reconstruction_loss = reconstruction_loss.to(device)
-            optical_loss = optical_loss.to(device)
-            shading_loss = shading_loss.to(device)
-            # albedo_loss = albedo_loss.to(device)
-            loss = optical_loss + shading_loss
-            # loss = optical_loss + reconstruction_loss + albedo_loss
-            running_loss += loss.item()
-            loss.backward()
-            optimizer.step()
-            wandb.log(
-                {
-                    "loss": loss.item(),
-                    "shading loss": shading_loss.item(),
-                    # "reconstruction loss": reconstruction_loss.item(),
-                    # "albedo loss": albedo_loss.item(),
-                    "optical loss": optical_loss.item(),
-                }
-            )
 
         epoch_batch_loss = running_loss / len(train_loader)
         print(f"Loss: {epoch_batch_loss}")
