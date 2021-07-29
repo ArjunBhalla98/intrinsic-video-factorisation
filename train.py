@@ -222,6 +222,9 @@ if __name__ == "__main__":
                 img = img.to(device)
                 mask = mask.to(device)
 
+                imageio.imsave(
+                    "viz_network.png", img.detach().permute(1, 2, 0).cpu().numpy()
+                )
                 img2 = img2.to(device_2)
                 mask2 = mask2.to(device_2)
 
@@ -254,7 +257,9 @@ if __name__ == "__main__":
                 static_albedo = static_albedo.to(device_2)
                 albedo = albedo.to(device_2)
 
-                shading_loss = shading_albedo_loss(static_shading, shading) * shading_lambda
+                shading_loss = (
+                    shading_albedo_loss(static_shading, shading) * shading_lambda
+                )
                 # albedo_loss = shading_albedo_loss(static_albedo, albedo) * albedo_lambda
                 ####################################################
                 # add shading loss and albedo loss to this for the SIGGRAPH
