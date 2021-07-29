@@ -195,10 +195,12 @@ if __name__ == "__main__":
             old_flow_max = np.max(flow)
             flow /= old_flow_max
             imageio.imsave(
-                "flowx.png", np.repeat(np.expand_dims(flow[0], 2), 3, axis=2)
+                "flowx.png",
+                np.repeat(np.expand_dims(flow[0], 2), 3, axis=2).astype(np.uint8),
             )
             imageio.imsave(
-                "flowy.png", np.repeat(np.expand_dims(flow[1], 2), 3, axis=2)
+                "flowy.png",
+                np.repeat(np.expand_dims(flow[1], 2), 3, axis=2).astype(np.uint8),
             )
             flowx, _ = factorspeople.get_image("flowx.png", mask_path)
             flowy, _ = factorspeople.get_image("flowy.png", mask_path)
