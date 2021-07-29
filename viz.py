@@ -43,7 +43,6 @@ if __name__ == "__main__":
     flow = np.load("/phoenix/S3/ab2383/data/flows/1.npy")
     flow = flow[0]
     old_flow_min = np.min(flow)
-    flow_old = np.copy(flow)
     flow -= old_flow_min
     old_flow_max = np.max(flow)
     flow /= old_flow_max
@@ -54,17 +53,8 @@ if __name__ == "__main__":
     flowx = flowx.squeeze(0)[:, :, 0]
     flowy = flowy.squeeze(0)[:, :, 0]
     flow = torch.cat((flowx, flowy), 0)
-    print(flow.max(), flow.min())
     flow *= old_flow_max
     flow += old_flow_min
-    print(
-        np.min(flow_old),
-        np.max(flow_old),
-        flow.min(),
-        flow.max(),
-        old_flow_min,
-        old_flow_max,
-    )
     plt.subplot(121)
     plt.imshow(flow[0])
     plt.subplot(122)

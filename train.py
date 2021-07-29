@@ -186,7 +186,24 @@ if __name__ == "__main__":
             if flow_idx > 99 or int(video_id) > 100:
                 continue
 
+            mask_path = data["mask_paths"][-2][0]
             flows = np.load(f"/phoenix/S3/ab2383/data/flows/{video_id}.npy")
+            flow = flows[flow_idx]
+
+            old_flow_min = np.min(flow)
+            flow -= old_flow_min
+            old_flow_max = np.max(flow)
+            flow /= old_flow_max
+            imageio.imsave("flowx.png", np.repeat(flow[0], 3))
+            imageio.imsave("flowy.png", np.repeat(flow[1], 3))
+            flowx, _ = factorspeople.get_image("flowx.png", mask_path)
+            flowy, _ = factorspeople.get_image("flowy.png", mask_path)
+            flowx = flowx.squeeze(0)[:, :, 0].to(device)
+            flowy = flowy.squeeze(0)[:, :, 0].to(device)
+            flow = torch.cat((flowx, flowy), 0)
+            flow *= old_flow_max
+            flow += old_flow_min
+            flow = np.expand_dims(flow.cpu.().numpy(), 0)
 
             img2, mask2 = factorspeople.get_image(
                 data["img_paths"][-1][0], data["mask_paths"][-1][0]
@@ -224,7 +241,7 @@ if __name__ == "__main__":
 
             optical_loss = (
                 optical_flow_loss(
-                    albedo, static_albedo_2, mask, flows[flow_idx], device
+                    albedo, static_albedo_2, mask, flow, device
                 )
                 * optical_lambda
             )
